@@ -90,11 +90,14 @@ select,
 textarea,
 button {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 12px;
   margin-top: 7px;
   margin-bottom: 15px;
   font-size: 16px;
   border-radius: 9px;
+  box-sizing: border-box;
 }
 
 input,
@@ -293,6 +296,14 @@ hr {
   border-top: 1px solid #eee;
   margin: 18px 0;
 }
+
+.other-media {
+  display: none;
+}
+
+.other-media.active {
+  display: block;
+}
 </style>
 </head>
 
@@ -304,11 +315,6 @@ hr {
 </header>
 
 <div class="container">
-
-
-<!-- =====================
-     ホーム
-===================== -->
 
 <section id="homePage" class="page active">
 
@@ -362,12 +368,6 @@ hr {
 
 </section>
 
-
-
-<!-- =====================
-     企業一覧
-===================== -->
-
 <section id="companiesPage" class="page">
 
   <div class="section-title">企業一覧</div>
@@ -384,7 +384,6 @@ hr {
     <div class="filter-row">
 
       <select id="filterStatus">
-
         <option value="">すべてのステータス</option>
         <option value="応募">応募</option>
         <option value="書類選考">書類選考</option>
@@ -395,12 +394,9 @@ hr {
         <option value="内定">内定</option>
         <option value="不合格">不合格</option>
         <option value="辞退">辞退</option>
-
       </select>
 
-      <button
-        class="secondary"
-        id="clearFilters">
+      <button class="secondary" id="clearFilters">
         リセット
       </button>
 
@@ -408,18 +404,11 @@ hr {
 
   </div>
 
-
   <div class="card">
     <div id="companyList"></div>
   </div>
 
 </section>
-
-
-
-<!-- =====================
-     企業詳細
-===================== -->
 
 <section id="companyDetailPage" class="page">
 
@@ -431,10 +420,7 @@ hr {
 
   <div class="card">
 
-    <div
-      id="detailCompanyName"
-      class="detail-title">
-    </div>
+    <div id="detailCompanyName" class="detail-title"></div>
 
     <div class="detail-row">
       <div class="detail-label">職種</div>
@@ -470,27 +456,21 @@ hr {
 
     <div class="action-row">
 
-      <button
-        id="editCompanyButton">
+      <button id="editCompanyButton">
         編集
       </button>
 
-      <button
-        id="deleteCompanyButton"
-        class="danger">
+      <button id="deleteCompanyButton" class="danger">
         削除
       </button>
 
     </div>
 
-    <button
-      id="detailAddInterviewButton"
-      class="blue">
+    <button id="detailAddInterviewButton" class="blue">
       ＋この企業の面接を登録
     </button>
 
   </div>
-
 
   <div class="section-title">
     面接履歴・予定
@@ -499,12 +479,6 @@ hr {
   <div id="detailInterviews"></div>
 
 </section>
-
-
-
-<!-- =====================
-     企業編集
-===================== -->
 
 <section id="editCompanyPage" class="page">
 
@@ -523,15 +497,12 @@ hr {
     <label>企業名</label>
     <input id="editCompanyName" type="text">
 
-
     <label>職種</label>
     <input id="editJobType" type="text">
-
 
     <label>ステータス</label>
 
     <select id="editStatus">
-
       <option value="応募">応募</option>
       <option value="書類選考">書類選考</option>
       <option value="一次面接">一次面接</option>
@@ -541,25 +512,37 @@ hr {
       <option value="内定">内定</option>
       <option value="不合格">不合格</option>
       <option value="辞退">辞退</option>
-
     </select>
 
-
     <label>求人媒体</label>
-    <input id="editMedia" type="text">
 
+    <select id="editMedia">
+      <option value="">選択してください</option>
+      <option value="マイナビ転職">マイナビ転職</option>
+      <option value="マイナビエージェント">マイナビエージェント</option>
+      <option value="リクナビNEXT">リクナビNEXT</option>
+      <option value="リクルートエージェント">リクルートエージェント</option>
+      <option value="エン転職">エン転職</option>
+      <option value="doda">doda</option>
+      <option value="求人BOX">求人BOX</option>
+      <option value="その他">その他</option>
+    </select>
+
+    <input
+      id="editOtherMedia"
+      class="other-media"
+      type="text"
+      placeholder="求人媒体名を入力"
+    >
 
     <label>応募日</label>
     <input id="editAppliedDate" type="date">
 
-
     <label>求人URL</label>
     <input id="editJobUrl" type="url">
 
-
     <label>メモ</label>
     <textarea id="editMemo"></textarea>
-
 
     <button id="saveCompanyButton">
       保存する
@@ -568,12 +551,6 @@ hr {
   </div>
 
 </section>
-
-
-
-<!-- =====================
-     企業登録
-===================== -->
 
 <section id="addCompanyPage" class="page">
 
@@ -591,7 +568,6 @@ hr {
       placeholder="例：株式会社〇〇"
     >
 
-
     <label>職種</label>
 
     <input
@@ -600,11 +576,9 @@ hr {
       placeholder="例：キャリアアドバイザー"
     >
 
-
     <label>ステータス</label>
 
     <select id="status">
-
       <option value="応募">応募</option>
       <option value="書類選考">書類選考</option>
       <option value="一次面接">一次面接</option>
@@ -614,18 +588,28 @@ hr {
       <option value="内定">内定</option>
       <option value="不合格">不合格</option>
       <option value="辞退">辞退</option>
-
     </select>
-
 
     <label>求人媒体</label>
 
-    <input
-      id="media"
-      type="text"
-      placeholder="例：doda"
-    >
+    <select id="media">
+      <option value="">選択してください</option>
+      <option value="マイナビ転職">マイナビ転職</option>
+      <option value="マイナビエージェント">マイナビエージェント</option>
+      <option value="リクナビNEXT">リクナビNEXT</option>
+      <option value="リクルートエージェント">リクルートエージェント</option>
+      <option value="エン転職">エン転職</option>
+      <option value="doda">doda</option>
+      <option value="求人BOX">求人BOX</option>
+      <option value="その他">その他</option>
+    </select>
 
+    <input
+      id="otherMedia"
+      class="other-media"
+      type="text"
+      placeholder="求人媒体名を入力"
+    >
 
     <label>応募日</label>
 
@@ -633,7 +617,6 @@ hr {
       id="appliedDate"
       type="date"
     >
-
 
     <label>求人URL</label>
 
@@ -643,14 +626,12 @@ hr {
       placeholder="https://..."
     >
 
-
     <label>メモ</label>
 
     <textarea
       id="memo"
       placeholder="面接で確認したいことなど">
     </textarea>
-
 
     <button id="addCompanyButton">
       企業を登録
@@ -659,12 +640,6 @@ hr {
   </div>
 
 </section>
-
-
-
-<!-- =====================
-     面接登録
-===================== -->
 
 <section id="addInterviewPage" class="page">
 
@@ -678,17 +653,13 @@ hr {
 
     <select id="interviewCompany"></select>
 
-
     <label>面接回数</label>
 
     <select id="interviewRound">
-
       <option value="一次面接">一次面接</option>
       <option value="二次面接">二次面接</option>
       <option value="最終面接">最終面接</option>
-
     </select>
-
 
     <label>面接日</label>
 
@@ -697,14 +668,15 @@ hr {
       type="date"
     >
 
-
     <label>面接時間</label>
 
     <input
       id="interviewTime"
-      type="time"
+      type="text"
+      inputmode="numeric"
+      placeholder="例：16:00"
+      maxlength="5"
     >
-
 
     <label>WEB面接URL</label>
 
@@ -714,7 +686,6 @@ hr {
       placeholder="https://..."
     >
 
-
     <button id="addInterviewButton">
       面接を登録
     </button>
@@ -722,12 +693,6 @@ hr {
   </div>
 
 </section>
-
-
-
-<!-- =====================
-     面接編集
-===================== -->
 
 <section id="editInterviewPage" class="page">
 
@@ -747,17 +712,13 @@ hr {
 
     <select id="editInterviewCompany"></select>
 
-
     <label>面接回数</label>
 
     <select id="editInterviewRound">
-
       <option value="一次面接">一次面接</option>
       <option value="二次面接">二次面接</option>
       <option value="最終面接">最終面接</option>
-
     </select>
-
 
     <label>面接日</label>
 
@@ -766,14 +727,15 @@ hr {
       type="date"
     >
 
-
     <label>面接時間</label>
 
     <input
       id="editInterviewTime"
-      type="time"
+      type="text"
+      inputmode="numeric"
+      placeholder="例：16:00"
+      maxlength="5"
     >
-
 
     <label>WEB面接URL</label>
 
@@ -781,7 +743,6 @@ hr {
       id="editInterviewUrl"
       type="url"
     >
-
 
     <button id="saveInterviewButton">
       保存する
@@ -791,14 +752,7 @@ hr {
 
 </section>
 
-
 </div>
-
-
-
-<!-- =====================
-     下部ナビ
-===================== -->
 
 <nav class="bottom-nav">
 
@@ -820,33 +774,182 @@ hr {
 
 </nav>
 
-
-
 <script>
-
-
-/* =====================
-   データ読み込み
-===================== */
 
 let companies =
 JSON.parse(
   localStorage.getItem("companies") || "[]"
 );
 
-
 let interviews =
 JSON.parse(
   localStorage.getItem("interviews") || "[]"
 );
 
-
 let selectedCompanyName = null;
-
 let editingCompanyName = null;
-
 let editingInterviewIndex = null;
 
+
+/* =====================
+   求人媒体
+===================== */
+
+const mediaOptions = [
+  "マイナビ転職",
+  "マイナビエージェント",
+  "リクナビNEXT",
+  "リクルートエージェント",
+  "エン転職",
+  "doda",
+  "求人BOX"
+];
+
+
+function getMediaValue(selectId, otherId) {
+
+  const select =
+    document.getElementById(selectId);
+
+  const other =
+    document.getElementById(otherId);
+
+  if (select.value === "その他") {
+
+    return other.value.trim();
+
+  }
+
+  return select.value;
+
+}
+
+
+function setMediaValue(selectId, otherId, mediaValue) {
+
+  const select =
+    document.getElementById(selectId);
+
+  const other =
+    document.getElementById(otherId);
+
+  if (!mediaValue) {
+
+    select.value = "";
+
+    other.value = "";
+
+    other.classList.remove("active");
+
+    return;
+
+  }
+
+  if (mediaOptions.includes(mediaValue)) {
+
+    select.value = mediaValue;
+
+    other.value = "";
+
+    other.classList.remove("active");
+
+  } else {
+
+    select.value = "その他";
+
+    other.value = mediaValue;
+
+    other.classList.add("active");
+
+  }
+
+}
+
+
+function setupMediaSelect(selectId, otherId) {
+
+  const select =
+    document.getElementById(selectId);
+
+  const other =
+    document.getElementById(otherId);
+
+  select.addEventListener(
+    "change",
+    function() {
+
+      if (select.value === "その他") {
+
+        other.classList.add("active");
+        other.focus();
+
+      } else {
+
+        other.classList.remove("active");
+        other.value = "";
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =====================
+   時間入力
+===================== */
+
+function normalizeTimeInput(input) {
+
+  input.addEventListener(
+    "input",
+    function() {
+
+      let value =
+        input.value.replace(/[^0-9:]/g, "");
+
+      if (
+        value.length === 4 &&
+        !value.includes(":")
+      ) {
+
+        value =
+          value.substring(0, 2) +
+          ":" +
+          value.substring(2);
+
+      }
+
+      if (value.length > 5) {
+
+        value =
+          value.substring(0, 5);
+
+      }
+
+      input.value = value;
+
+    }
+  );
+
+}
+
+
+function isValidTime(value) {
+
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+
+}
+
+
+normalizeTimeInput(
+  document.getElementById("interviewTime")
+);
+
+normalizeTimeInput(
+  document.getElementById("editInterviewTime")
+);
 
 
 /* =====================
@@ -854,7 +957,6 @@ let editingInterviewIndex = null;
 ===================== */
 
 function showPage(pageId) {
-
 
   document
     .querySelectorAll(".page")
@@ -864,17 +966,14 @@ function showPage(pageId) {
 
     });
 
-
   const page =
     document.getElementById(pageId);
-
 
   if (page) {
 
     page.classList.add("active");
 
   }
-
 
   document
     .querySelectorAll(".bottom-nav button")
@@ -883,7 +982,6 @@ function showPage(pageId) {
       button.classList.remove("active");
 
     });
-
 
   if (pageId === "homePage") {
 
@@ -895,7 +993,6 @@ function showPage(pageId) {
 
   }
 
-
   if (pageId === "companiesPage") {
 
     document
@@ -906,7 +1003,6 @@ function showPage(pageId) {
 
   }
 
-
   if (pageId === "addCompanyPage") {
 
     document
@@ -914,7 +1010,6 @@ function showPage(pageId) {
       .classList.add("active");
 
   }
-
 
   if (pageId === "addInterviewPage") {
 
@@ -929,7 +1024,6 @@ function showPage(pageId) {
 }
 
 
-
 /* =====================
    ナビ
 ===================== */
@@ -942,7 +1036,6 @@ document
 
   });
 
-
 document
   .getElementById("navCompanies")
   .addEventListener("click", function() {
@@ -951,7 +1044,6 @@ document
 
   });
 
-
 document
   .getElementById("navAddCompany")
   .addEventListener("click", function() {
@@ -959,7 +1051,6 @@ document
     showPage("addCompanyPage");
 
   });
-
 
 document
   .getElementById("navAddInterview")
@@ -970,7 +1061,6 @@ document
   });
 
 
-
 /* =====================
    企業登録
 ===================== */
@@ -979,13 +1069,11 @@ document
   .getElementById("addCompanyButton")
   .addEventListener("click", function() {
 
-
     const name =
       document
         .getElementById("companyName")
         .value
         .trim();
-
 
     const jobType =
       document
@@ -993,25 +1081,21 @@ document
         .value
         .trim();
 
-
     const status =
       document
         .getElementById("status")
         .value;
 
-
     const media =
-      document
-        .getElementById("media")
-        .value
-        .trim();
-
+      getMediaValue(
+        "media",
+        "otherMedia"
+      );
 
     const appliedDate =
       document
         .getElementById("appliedDate")
         .value;
-
 
     const jobUrl =
       document
@@ -1019,13 +1103,11 @@ document
         .value
         .trim();
 
-
     const memo =
       document
         .getElementById("memo")
         .value
         .trim();
-
 
     if (name === "") {
 
@@ -1035,28 +1117,19 @@ document
 
     }
 
-
     companies.push({
 
       name: name,
-
       jobType: jobType,
-
       status: status,
-
       media: media,
-
       appliedDate: appliedDate,
-
       jobUrl: jobUrl,
-
       memo: memo
 
     });
 
-
     saveCompanies();
-
 
     document
       .getElementById("companyName")
@@ -1071,6 +1144,14 @@ document
       .value = "";
 
     document
+      .getElementById("otherMedia")
+      .value = "";
+
+    document
+      .getElementById("otherMedia")
+      .classList.remove("active");
+
+    document
       .getElementById("appliedDate")
       .value = "";
 
@@ -1082,7 +1163,6 @@ document
       .getElementById("memo")
       .value = "";
 
-
     updateCompanySelect();
 
     alert("企業を登録しました");
@@ -1090,7 +1170,6 @@ document
     showPage("companiesPage");
 
   });
-
 
 
 /* =====================
@@ -1107,7 +1186,6 @@ function saveCompanies() {
 }
 
 
-
 /* =====================
    面接データ保存
 ===================== */
@@ -1122,13 +1200,11 @@ function saveInterviews() {
 }
 
 
-
 /* =====================
    企業選択欄
 ===================== */
 
 function updateCompanySelect() {
-
 
   const selects = [
 
@@ -1138,19 +1214,14 @@ function updateCompanySelect() {
 
   ];
 
-
   selects.forEach(function(select) {
 
-
     if (!select) return;
-
 
     const currentValue =
       select.value;
 
-
     select.innerHTML = "";
-
 
     if (companies.length === 0) {
 
@@ -1168,7 +1239,6 @@ function updateCompanySelect() {
 
     }
 
-
     companies.forEach(function(company) {
 
       const option =
@@ -1183,7 +1253,6 @@ function updateCompanySelect() {
       select.appendChild(option);
 
     });
-
 
     if (
       companies.some(function(company) {
@@ -1200,21 +1269,17 @@ function updateCompanySelect() {
 }
 
 
-
 /* =====================
    企業一覧表示
 ===================== */
 
 function displayCompanies() {
 
-
   const list =
     document
       .getElementById("companyList");
 
-
   list.innerHTML = "";
-
 
   const keyword =
     document
@@ -1223,30 +1288,24 @@ function displayCompanies() {
       .trim()
       .toLowerCase();
 
-
   const filterStatus =
     document
       .getElementById("filterStatus")
       .value;
 
-
   const filtered =
     companies.filter(function(company) {
-
 
       const name =
         (company.name || "")
           .toLowerCase();
 
-
       const matchesName =
         name.includes(keyword);
-
 
       const matchesStatus =
         filterStatus === "" ||
         company.status === filterStatus;
-
 
       return (
         matchesName &&
@@ -1254,7 +1313,6 @@ function displayCompanies() {
       );
 
     });
-
 
   if (filtered.length === 0) {
 
@@ -1265,17 +1323,13 @@ function displayCompanies() {
 
   }
 
-
   filtered.forEach(function(company) {
-
 
     const div =
       document.createElement("div");
 
-
     div.className =
       "company";
-
 
     div.innerHTML =
 
@@ -1297,7 +1351,6 @@ function displayCompanies() {
       escapeHtml(company.status || "未登録") +
       '</span>';
 
-
     div.addEventListener(
       "click",
       function() {
@@ -1309,13 +1362,11 @@ function displayCompanies() {
       }
     );
 
-
     list.appendChild(div);
 
   });
 
 }
-
 
 
 /* =====================
@@ -1329,14 +1380,12 @@ document
     displayCompanies
   );
 
-
 document
   .getElementById("filterStatus")
   .addEventListener(
     "change",
     displayCompanies
   );
-
 
 document
   .getElementById("clearFilters")
@@ -1358,13 +1407,11 @@ document
   );
 
 
-
 /* =====================
    企業詳細
 ===================== */
 
 function showCompanyDetail(companyName) {
-
 
   const company =
     companies.find(function(item) {
@@ -1372,7 +1419,6 @@ function showCompanyDetail(companyName) {
       return item.name === companyName;
 
     });
-
 
   if (!company) {
 
@@ -1382,48 +1428,39 @@ function showCompanyDetail(companyName) {
 
   }
 
-
   selectedCompanyName =
     companyName;
-
 
   document
     .getElementById("detailCompanyName")
     .textContent =
       company.name || "企業名未登録";
 
-
   document
     .getElementById("detailJobType")
     .textContent =
       company.jobType || "未登録";
-
 
   document
     .getElementById("detailStatus")
     .textContent =
       company.status || "未登録";
 
-
   document
     .getElementById("detailMedia")
     .textContent =
       company.media || "未登録";
-
 
   document
     .getElementById("detailAppliedDate")
     .textContent =
       company.appliedDate || "未登録";
 
-
   const jobUrl =
     document
       .getElementById("detailJobUrl");
 
-
   jobUrl.innerHTML = "";
-
 
   if (company.jobUrl) {
 
@@ -1454,20 +1491,16 @@ function showCompanyDetail(companyName) {
 
   }
 
-
   document
     .getElementById("detailMemo")
     .textContent =
       company.memo || "メモなし";
 
-
   renderCompanyInterviews(companyName);
-
 
   showPage("companyDetailPage");
 
 }
-
 
 
 /* =====================
@@ -1476,14 +1509,11 @@ function showCompanyDetail(companyName) {
 
 function renderCompanyInterviews(companyName) {
 
-
   const area =
     document
       .getElementById("detailInterviews");
 
-
   area.innerHTML = "";
-
 
   const companyInterviews =
     interviews
@@ -1515,7 +1545,6 @@ function renderCompanyInterviews(companyName) {
 
       });
 
-
   if (companyInterviews.length === 0) {
 
     area.innerHTML =
@@ -1525,9 +1554,7 @@ function renderCompanyInterviews(companyName) {
 
   }
 
-
   companyInterviews.forEach(function(item) {
-
 
     const div =
       createInterviewCard(
@@ -1535,13 +1562,11 @@ function renderCompanyInterviews(companyName) {
         item.index
       );
 
-
     area.appendChild(div);
 
   });
 
 }
-
 
 
 /* =====================
@@ -1553,19 +1578,15 @@ function createInterviewCard(
   index
 ) {
 
-
   const div =
     document.createElement("div");
-
 
   div.className =
     "interview";
 
-
   const companyName =
     interview.companyName ||
     "企業名未登録";
-
 
   div.innerHTML =
 
@@ -1583,104 +1604,86 @@ function createInterviewCard(
     escapeHtml(interview.round || "面接") +
     '</div>';
 
-
   if (interview.url) {
-
 
     const link =
       document.createElement("a");
 
-
     link.className =
       "web-button";
-
 
     link.href =
       interview.url;
 
-
     link.target =
       "_blank";
-
 
     link.rel =
       "noopener noreferrer";
 
-
     link.textContent =
       "WEB面接を開く";
-
 
     div.appendChild(link);
 
   }
 
-
   const actions =
     document.createElement("div");
-
 
   actions.className =
     "action-row";
 
-
   const editButton =
     document.createElement("button");
-
 
   editButton.textContent =
     "編集";
 
-
   editButton.addEventListener(
     "click",
-    function() {
+    function(event) {
+
+      event.stopPropagation();
 
       editInterview(index);
 
     }
   );
 
-
   const deleteButton =
     document.createElement("button");
-
 
   deleteButton.textContent =
     "削除";
 
-
   deleteButton.className =
     "danger";
 
-
   deleteButton.addEventListener(
     "click",
-    function() {
+    function(event) {
+
+      event.stopPropagation();
 
       deleteInterview(index);
 
     }
   );
 
-
   actions.appendChild(
     editButton
   );
-
 
   actions.appendChild(
     deleteButton
   );
 
-
   div.appendChild(actions);
-
 
   return div;
 
 }
-
 
 
 /* =====================
@@ -1693,7 +1696,6 @@ document
     "click",
     function() {
 
-
       const company =
         companies.find(function(item) {
 
@@ -1704,7 +1706,6 @@ document
 
         });
 
-
       if (!company) {
 
         alert("企業情報が見つかりません");
@@ -1713,58 +1714,49 @@ document
 
       }
 
-
       editingCompanyName =
         selectedCompanyName;
-
 
       document
         .getElementById("editCompanyName")
         .value =
           company.name || "";
 
-
       document
         .getElementById("editJobType")
         .value =
           company.jobType || "";
-
 
       document
         .getElementById("editStatus")
         .value =
           company.status || "応募";
 
-
-      document
-        .getElementById("editMedia")
-        .value =
-          company.media || "";
-
+      setMediaValue(
+        "editMedia",
+        "editOtherMedia",
+        company.media || ""
+      );
 
       document
         .getElementById("editAppliedDate")
         .value =
           company.appliedDate || "";
 
-
       document
         .getElementById("editJobUrl")
         .value =
           company.jobUrl || "";
-
 
       document
         .getElementById("editMemo")
         .value =
           company.memo || "";
 
-
       showPage("editCompanyPage");
 
     }
   );
-
 
 
 /* =====================
@@ -1777,7 +1769,6 @@ document
     "click",
     function() {
 
-
       const company =
         companies.find(function(item) {
 
@@ -1788,7 +1779,6 @@ document
 
         });
 
-
       if (!company) {
 
         alert("企業情報が見つかりません");
@@ -1797,13 +1787,11 @@ document
 
       }
 
-
       const newName =
         document
           .getElementById("editCompanyName")
           .value
           .trim();
-
 
       if (newName === "") {
 
@@ -1812,7 +1800,6 @@ document
         return;
 
       }
-
 
       const duplicate =
         companies.some(function(item) {
@@ -1824,7 +1811,6 @@ document
 
         });
 
-
       if (duplicate) {
 
         alert("同じ企業名がすでに登録されています");
@@ -1833,14 +1819,11 @@ document
 
       }
 
-
       const oldName =
         company.name;
 
-
       company.name =
         newName;
-
 
       company.jobType =
         document
@@ -1848,25 +1831,21 @@ document
           .value
           .trim();
 
-
       company.status =
         document
           .getElementById("editStatus")
           .value;
 
-
       company.media =
-        document
-          .getElementById("editMedia")
-          .value
-          .trim();
-
+        getMediaValue(
+          "editMedia",
+          "editOtherMedia"
+        );
 
       company.appliedDate =
         document
           .getElementById("editAppliedDate")
           .value;
-
 
       company.jobUrl =
         document
@@ -1874,13 +1853,11 @@ document
           .value
           .trim();
 
-
       company.memo =
         document
           .getElementById("editMemo")
           .value
           .trim();
-
 
       interviews.forEach(
         function(interview) {
@@ -1898,28 +1875,22 @@ document
         }
       );
 
-
       saveCompanies();
 
       saveInterviews();
 
-
       selectedCompanyName =
         newName;
-
 
       editingCompanyName =
         newName;
 
-
       alert("企業情報を更新しました");
-
 
       showCompanyDetail(newName);
 
     }
   );
-
 
 
 /* =====================
@@ -1932,13 +1903,11 @@ document
     "click",
     function() {
 
-
       if (!selectedCompanyName) {
 
         return;
 
       }
-
 
       const company =
         companies.find(function(item) {
@@ -1950,7 +1919,6 @@ document
 
         });
 
-
       if (!company) {
 
         alert("企業情報が見つかりません");
@@ -1958,7 +1926,6 @@ document
         return;
 
       }
-
 
       const relatedInterviews =
         interviews.filter(function(interview) {
@@ -1970,12 +1937,10 @@ document
 
         });
 
-
       let message =
         "「" +
         selectedCompanyName +
         "」を削除しますか？";
-
 
       if (relatedInterviews.length > 0) {
 
@@ -1986,7 +1951,6 @@ document
 
       }
 
-
       if (
         !confirm(message)
       ) {
@@ -1994,7 +1958,6 @@ document
         return;
 
       }
-
 
       companies =
         companies.filter(function(item) {
@@ -2006,7 +1969,6 @@ document
 
         });
 
-
       interviews =
         interviews.filter(function(interview) {
 
@@ -2017,24 +1979,19 @@ document
 
         });
 
-
       saveCompanies();
 
       saveInterviews();
 
-
       selectedCompanyName =
         null;
 
-
       alert("削除しました");
-
 
       showPage("companiesPage");
 
     }
   );
-
 
 
 /* =====================
@@ -2047,24 +2004,19 @@ document
     "click",
     function() {
 
-
       updateCompanySelect();
-
 
       const select =
         document
           .getElementById("interviewCompany");
 
-
       select.value =
         selectedCompanyName || "";
-
 
       showPage("addInterviewPage");
 
     }
   );
-
 
 
 /* =====================
@@ -2077,37 +2029,32 @@ document
     "click",
     function() {
 
-
       const companyName =
         document
           .getElementById("interviewCompany")
           .value;
-
 
       const round =
         document
           .getElementById("interviewRound")
           .value;
 
-
       const date =
         document
           .getElementById("interviewDate")
           .value;
 
-
       const time =
         document
           .getElementById("interviewTime")
-          .value;
-
+          .value
+          .trim();
 
       const url =
         document
           .getElementById("interviewUrl")
           .value
           .trim();
-
 
       if (companyName === "") {
 
@@ -2117,7 +2064,6 @@ document
 
       }
 
-
       if (date === "") {
 
         alert("面接日を入力してください");
@@ -2125,7 +2071,6 @@ document
         return;
 
       }
-
 
       if (time === "") {
 
@@ -2135,6 +2080,13 @@ document
 
       }
 
+      if (!isValidTime(time)) {
+
+        alert("面接時間は「16:00」のように入力してください");
+
+        return;
+
+      }
 
       if (url === "") {
 
@@ -2144,42 +2096,31 @@ document
 
       }
 
-
       interviews.push({
 
         companyName: companyName,
-
         round: round,
-
         date: date,
-
         time: time,
-
         url: url
 
       });
 
-
       saveInterviews();
-
 
       document
         .getElementById("interviewDate")
         .value = "";
 
-
       document
         .getElementById("interviewTime")
         .value = "";
-
 
       document
         .getElementById("interviewUrl")
         .value = "";
 
-
       alert("面接を登録しました");
-
 
       if (selectedCompanyName) {
 
@@ -2197,17 +2138,14 @@ document
   );
 
 
-
 /* =====================
    面接編集
 ===================== */
 
 function editInterview(index) {
 
-
   const interview =
     interviews[index];
-
 
   if (!interview) {
 
@@ -2217,48 +2155,39 @@ function editInterview(index) {
 
   }
 
-
   editingInterviewIndex =
     index;
 
-
   updateCompanySelect();
-
 
   document
     .getElementById("editInterviewCompany")
     .value =
       interview.companyName || "";
 
-
   document
     .getElementById("editInterviewRound")
     .value =
       interview.round || "一次面接";
-
 
   document
     .getElementById("editInterviewDate")
     .value =
       interview.date || "";
 
-
   document
     .getElementById("editInterviewTime")
     .value =
       interview.time || "";
-
 
   document
     .getElementById("editInterviewUrl")
     .value =
       interview.url || "";
 
-
   showPage("editInterviewPage");
 
 }
-
 
 
 /* =====================
@@ -2271,7 +2200,6 @@ document
     "click",
     function() {
 
-
       if (
         editingInterviewIndex === null
       ) {
@@ -2280,12 +2208,10 @@ document
 
       }
 
-
       const interview =
         interviews[
           editingInterviewIndex
         ];
-
 
       if (!interview) {
 
@@ -2295,37 +2221,32 @@ document
 
       }
 
-
       const companyName =
         document
           .getElementById("editInterviewCompany")
           .value;
-
 
       const round =
         document
           .getElementById("editInterviewRound")
           .value;
 
-
       const date =
         document
           .getElementById("editInterviewDate")
           .value;
 
-
       const time =
         document
           .getElementById("editInterviewTime")
-          .value;
-
+          .value
+          .trim();
 
       const url =
         document
           .getElementById("editInterviewUrl")
           .value
           .trim();
-
 
       if (companyName === "") {
 
@@ -2335,7 +2256,6 @@ document
 
       }
 
-
       if (date === "") {
 
         alert("面接日を入力してください");
@@ -2343,7 +2263,6 @@ document
         return;
 
       }
-
 
       if (time === "") {
 
@@ -2353,6 +2272,13 @@ document
 
       }
 
+      if (!isValidTime(time)) {
+
+        alert("面接時間は「16:00」のように入力してください");
+
+        return;
+
+      }
 
       if (url === "") {
 
@@ -2362,36 +2288,27 @@ document
 
       }
 
-
       interview.companyName =
         companyName;
-
 
       interview.round =
         round;
 
-
       interview.date =
         date;
-
 
       interview.time =
         time;
 
-
       interview.url =
         url;
 
-
       saveInterviews();
-
 
       editingInterviewIndex =
         null;
 
-
       alert("面接情報を更新しました");
-
 
       if (selectedCompanyName) {
 
@@ -2409,17 +2326,14 @@ document
   );
 
 
-
 /* =====================
    面接削除
 ===================== */
 
 function deleteInterview(index) {
 
-
   const interview =
     interviews[index];
-
 
   if (!interview) {
 
@@ -2429,11 +2343,9 @@ function deleteInterview(index) {
 
   }
 
-
   const companyName =
     interview.companyName ||
     "企業名未登録";
-
 
   if (
     !confirm(
@@ -2450,18 +2362,14 @@ function deleteInterview(index) {
 
   }
 
-
   interviews.splice(
     index,
     1
   );
 
-
   saveInterviews();
 
-
   alert("面接を削除しました");
-
 
   if (selectedCompanyName) {
 
@@ -2478,17 +2386,14 @@ function deleteInterview(index) {
 }
 
 
-
 /* =====================
    ホーム
 ===================== */
 
 function renderHome() {
 
-
   const now =
     new Date();
-
 
   document
     .getElementById("todayText")
@@ -2503,22 +2408,18 @@ function renderHome() {
         }
       );
 
-
   const year =
     now.getFullYear();
-
 
   const month =
     String(
       now.getMonth() + 1
     ).padStart(2, "0");
 
-
   const day =
     String(
       now.getDate()
     ).padStart(2, "0");
-
 
   const today =
     year +
@@ -2527,21 +2428,17 @@ function renderHome() {
     "-" +
     day;
 
-
   const todayArea =
     document
       .getElementById("todayInterviews");
-
 
   const upcomingArea =
     document
       .getElementById("upcomingInterviews");
 
-
   todayArea.innerHTML = "";
 
   upcomingArea.innerHTML = "";
-
 
   const todayList =
     interviews
@@ -2564,7 +2461,6 @@ function renderHome() {
 
       });
 
-
   const upcomingList =
     interviews
       .filter(function(interview) {
@@ -2586,7 +2482,6 @@ function renderHome() {
         );
 
       });
-
 
   if (
     todayList.length === 0
@@ -2613,7 +2508,6 @@ function renderHome() {
     );
 
   }
-
 
   if (
     upcomingList.length === 0
@@ -2643,7 +2537,6 @@ function renderHome() {
 
   }
 
-
   document
     .getElementById("selectionCount")
     .textContent =
@@ -2655,7 +2548,6 @@ function renderHome() {
         );
 
       }).length;
-
 
   document
     .getElementById("interviewCount")
@@ -2670,7 +2562,6 @@ function renderHome() {
 
       }).length;
 
-
   document
     .getElementById("waitingCount")
     .textContent =
@@ -2682,7 +2573,6 @@ function renderHome() {
         );
 
       }).length;
-
 
   document
     .getElementById("offerCount")
@@ -2696,7 +2586,6 @@ function renderHome() {
 
       }).length;
 
-
   document
     .getElementById("rejectedCount")
     .textContent =
@@ -2708,7 +2597,6 @@ function renderHome() {
         );
 
       }).length;
-
 
   document
     .getElementById("withdrawnCount")
@@ -2725,31 +2613,36 @@ function renderHome() {
 }
 
 
-
 /* =====================
    HTMLエスケープ
 ===================== */
 
 function escapeHtml(value) {
 
-
   const div =
     document.createElement("div");
 
-
   div.textContent =
     String(value);
-
 
   return div.innerHTML;
 
 }
 
 
-
 /* =====================
-   初期表示
+   初期設定
 ===================== */
+
+setupMediaSelect(
+  "media",
+  "otherMedia"
+);
+
+setupMediaSelect(
+  "editMedia",
+  "editOtherMedia"
+);
 
 updateCompanySelect();
 
