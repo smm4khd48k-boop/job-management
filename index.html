@@ -1,1 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>就職活動管理</title>
 
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+button {
+  background: #222;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+
+.company {
+  border-top: 1px solid #ddd;
+  padding-top: 15px;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>就職活動管理</h1>
+
+<div class="card">
+
+<h2>企業を登録</h2>
+
+<label>企業名</label>
+<input id="companyName" type="text" placeholder="例：株式会社〇〇">
+
+<label>職種</label>
+<input id="jobType" type="text" placeholder="例：キャリアアドバイザー">
+
+<label>ステータス</label>
+<select id="status">
+<option value="応募">応募</option>
+<option value="書類選考">書類選考</option>
+<option value="一次面接">一次面接</option>
+<option value="二次面接">二次面接</option>
+<option value="最終面接">最終面接</option>
+<option value="面接結果待ち">面接結果待ち</option>
+<option value="内定">内定</option>
+<option value="不合格">不合格</option>
+<option value="辞退">辞退</option>
+</select>
+
+<label>求人媒体</label>
+<input id="media" type="text" placeholder="例：doda">
+
+<button onclick="addCompany()">企業を登録</button>
+
+</div>
+
+<div class="card">
+
+<h2>企業一覧</h2>
+
+<div id="companyList"></div>
+
+</div>
+
+</div>
+
+<script>
+
+let companies = JSON.parse(
+  localStorage.getItem("companies") || "[]"
+);
+
+function addCompany() {
+
+  const name =
+    document.getElementById("companyName").value.trim();
+
+  const jobType =
+    document.getElementById("jobType").value.trim();
+
+  const status =
+    document.getElementById("status").value;
+
+  const media =
+    document.getElementById("media").value.trim();
+
+  if (name === "") {
+    alert("企業名を入力してください");
+    return;
+  }
+
+  const company = {
+    name: name,
+    jobType: jobType,
+    status: status,
+    media: media
+  };
+
+  companies.push(company);
+
+  localStorage.setItem(
+    "companies",
+    JSON.stringify(companies)
+  );
+
+  document.getElementById("companyName").value = "";
+  document.getElementById("jobType").value = "";
+  document.getElementById("media").value = "";
+
+  displayCompanies();
+
+  alert("企業を登録しました");
+}
+
+function displayCompanies() {
+
+  const list =
+    document.getElementById("companyList");
+
+  list.innerHTML = "";
+
+  if (companies.length === 0) {
+    list.innerHTML = "<p>まだ企業がありません</p>";
+    return;
+  }
+
+  companies.forEach(function(company) {
+
+    const div = document.createElement("div");
+
+    div.className = "company";
+
+    div.innerHTML =
+      "<strong>" + company.name + "</strong>" +
+      "<br>職種：" + company.jobType +
+      "<br>ステータス：" + company.status +
+      "<br>求人媒体：" + company.media;
+
+    list.appendChild(div);
+
+  });
+}
+
+displayCompanies();
+
+</script>
+
+</body>
+</html>
