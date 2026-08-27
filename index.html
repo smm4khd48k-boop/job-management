@@ -114,12 +114,13 @@ button.secondary {
 }
 
 .company {
-  border-top: 1px solid #eee;
-  padding: 14px 0;
+  padding: 16px 4px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
 }
 
-.company:first-child {
-  border-top: none;
+.company:last-child {
+  border-bottom: none;
 }
 
 .company-name {
@@ -175,6 +176,33 @@ button.secondary {
   padding: 11px;
   border-radius: 9px;
   margin-top: 10px;
+}
+
+.back-button {
+  background: #e9e9ed;
+  color: #222;
+  margin-bottom: 15px;
+}
+
+.detail-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 18px;
+}
+
+.detail-row {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: #777;
+}
+
+.detail-value {
+  font-size: 16px;
+  margin-top: 4px;
 }
 
 .empty {
@@ -282,8 +310,86 @@ label {
   <div class="section-title">企業一覧</div>
 
   <div class="card">
+
     <div id="companyList"></div>
+
   </div>
+
+</section>
+
+
+
+<!-- =====================
+     企業詳細
+===================== -->
+
+<section id="companyDetailPage" class="page">
+
+  <button
+    class="back-button"
+    onclick="showPage('companiesPage')">
+    ← 企業一覧に戻る
+  </button>
+
+
+  <div class="card">
+
+    <div
+      id="detailCompanyName"
+      class="detail-title">
+    </div>
+
+
+    <div class="detail-row">
+
+      <div class="detail-label">
+        職種
+      </div>
+
+      <div
+        id="detailJobType"
+        class="detail-value">
+      </div>
+
+    </div>
+
+
+    <div class="detail-row">
+
+      <div class="detail-label">
+        ステータス
+      </div>
+
+      <div
+        id="detailStatus"
+        class="detail-value">
+      </div>
+
+    </div>
+
+
+    <div class="detail-row">
+
+      <div class="detail-label">
+        求人媒体
+      </div>
+
+      <div
+        id="detailMedia"
+        class="detail-value">
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="section-title">
+    面接履歴・予定
+  </div>
+
+
+  <div id="detailInterviews"></div>
 
 </section>
 
@@ -295,15 +401,29 @@ label {
 
 <section id="addCompanyPage" class="page">
 
-  <div class="section-title">企業を登録</div>
+  <div class="section-title">
+    企業を登録
+  </div>
 
   <div class="card">
 
     <label>企業名</label>
-    <input id="companyName" type="text" placeholder="例：株式会社〇〇">
+
+    <input
+      id="companyName"
+      type="text"
+      placeholder="例：株式会社〇〇"
+    >
+
 
     <label>職種</label>
-    <input id="jobType" type="text" placeholder="例：キャリアアドバイザー">
+
+    <input
+      id="jobType"
+      type="text"
+      placeholder="例：キャリアアドバイザー"
+    >
+
 
     <label>ステータス</label>
 
@@ -347,7 +467,9 @@ label {
 
 <section id="addInterviewPage" class="page">
 
-  <div class="section-title">面接を登録</div>
+  <div class="section-title">
+    面接を登録
+  </div>
 
   <div class="card">
 
@@ -360,9 +482,17 @@ label {
 
     <select id="interviewRound">
 
-      <option value="一次面接">一次面接</option>
-      <option value="二次面接">二次面接</option>
-      <option value="最終面接">最終面接</option>
+      <option value="一次面接">
+        一次面接
+      </option>
+
+      <option value="二次面接">
+        二次面接
+      </option>
+
+      <option value="最終面接">
+        最終面接
+      </option>
 
     </select>
 
@@ -457,6 +587,7 @@ JSON.parse(
 
 function showPage(pageId) {
 
+
   document
     .querySelectorAll(".page")
     .forEach(function(page) {
@@ -526,7 +657,7 @@ function showPage(pageId) {
 
 
 /* =====================
-   ナビ
+   ナビゲーション
 ===================== */
 
 document
@@ -662,6 +793,7 @@ document
 
 function updateCompanySelect() {
 
+
   const select =
     document
       .getElementById("interviewCompany");
@@ -688,6 +820,7 @@ function updateCompanySelect() {
 
 
   companies.forEach(function(company) {
+
 
     const option =
       document.createElement("option");
@@ -821,8 +954,6 @@ document
     alert("面接を登録しました");
 
 
-    renderHome();
-
     showPage("homePage");
 
   });
@@ -834,6 +965,7 @@ document
 ===================== */
 
 function displayCompanies() {
+
 
   const list =
     document
@@ -884,6 +1016,16 @@ function displayCompanies() {
       '</span>';
 
 
+    div.addEventListener(
+      "click",
+      function() {
+
+        showCompanyDetail(company.name);
+
+      }
+    );
+
+
     list.appendChild(div);
 
   });
@@ -893,7 +1035,110 @@ function displayCompanies() {
 
 
 /* =====================
-   面接表示
+   企業詳細
+===================== */
+
+function showCompanyDetail(companyName) {
+
+
+  const company =
+    companies.find(function(item) {
+
+      return item.name === companyName;
+
+    });
+
+
+  if (!company) {
+
+    alert("企業情報が見つかりません");
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("detailCompanyName")
+    .textContent =
+      company.name;
+
+
+  document
+    .getElementById("detailJobType")
+    .textContent =
+      company.jobType || "未登録";
+
+
+  document
+    .getElementById("detailStatus")
+    .textContent =
+      company.status || "未登録";
+
+
+  document
+    .getElementById("detailMedia")
+    .textContent =
+      company.media || "未登録";
+
+
+  const interviewArea =
+    document
+      .getElementById("detailInterviews");
+
+
+  interviewArea.innerHTML = "";
+
+
+  const companyInterviews =
+    interviews
+      .filter(function(interview) {
+
+        return interview.companyName === company.name;
+
+      })
+      .sort(function(a, b) {
+
+        return (
+          a.date + a.time
+        ).localeCompare(
+          b.date + b.time
+        );
+
+      });
+
+
+  if (companyInterviews.length === 0) {
+
+    interviewArea.innerHTML =
+      '<div class="card empty">面接予定はありません</div>';
+
+  } else {
+
+
+    companyInterviews.forEach(
+      function(interview) {
+
+
+        interviewArea.appendChild(
+          createInterviewCard(interview)
+        );
+
+
+      }
+    );
+
+  }
+
+
+  showPage("companyDetailPage");
+
+}
+
+
+
+/* =====================
+   面接カード
 ===================== */
 
 function createInterviewCard(interview) {
@@ -919,24 +1164,36 @@ function createInterviewCard(interview) {
     '</div>' +
 
     '<div class="interview-round">' +
-    interview.round +
+    (interview.round || "面接") +
     '</div>';
 
 
   if (interview.url) {
 
+
     const link =
       document.createElement("a");
 
-    link.className = "web-button";
 
-    link.href = interview.url;
+    link.className =
+      "web-button";
 
-    link.target = "_blank";
 
-    link.rel = "noopener noreferrer";
+    link.href =
+      interview.url;
 
-    link.textContent = "WEB面接を開く";
+
+    link.target =
+      "_blank";
+
+
+    link.rel =
+      "noopener noreferrer";
+
+
+    link.textContent =
+      "WEB面接を開く";
+
 
     div.appendChild(link);
 
