@@ -6,27 +6,83 @@
 <title>就職活動管理</title>
 
 <style>
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f5f5f5;
   margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f5f5f7;
+  color: #222;
+}
+
+header {
+  background: #222;
+  color: white;
   padding: 20px;
 }
 
-.container {
-  max-width: 600px;
-  margin: auto;
+header h1 {
+  margin: 0;
+  font-size: 23px;
 }
 
-h1 {
-  font-size: 24px;
+header p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.container {
+  max-width: 650px;
+  margin: auto;
+  padding: 15px 15px 90px;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.section-title {
+  font-size: 19px;
+  font-weight: bold;
+  margin: 18px 0 10px;
 }
 
 .card {
   background: white;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 15px;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #777;
+}
+
+.stat-number {
+  font-size: 27px;
+  font-weight: bold;
+  margin-top: 4px;
 }
 
 input,
@@ -34,163 +90,353 @@ select,
 button {
   width: 100%;
   padding: 12px;
-  margin-top: 8px;
+  margin-top: 7px;
   margin-bottom: 15px;
   font-size: 16px;
-  box-sizing: border-box;
+  border-radius: 9px;
+}
+
+input,
+select {
+  border: 1px solid #d1d1d6;
+  background: white;
 }
 
 button {
+  border: none;
   background: #222;
   color: white;
-  border: none;
-  border-radius: 8px;
+}
+
+button.secondary {
+  background: #e9e9ed;
+  color: #222;
 }
 
 .company {
-  border-top: 1px solid #ddd;
-  padding-top: 15px;
-  margin-top: 15px;
+  border-top: 1px solid #eee;
+  padding: 14px 0;
+}
+
+.company:first-child {
+  border-top: none;
+}
+
+.company-name {
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.meta {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.status {
+  display: inline-block;
+  background: #eef2ff;
+  color: #333;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-top: 7px;
 }
 
 .interview {
   background: #f0f4ff;
-  padding: 15px;
-  border-radius: 10px;
-  margin-top: 10px;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
 }
 
-a {
+.interview-company {
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.interview-date {
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.interview-round {
+  font-size: 13px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.web-button {
   display: block;
   text-align: center;
   background: #2563eb;
   color: white;
   text-decoration: none;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 11px;
+  border-radius: 9px;
   margin-top: 10px;
+}
+
+.empty {
+  color: #777;
+  text-align: center;
+  padding: 15px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 65px;
+  background: white;
+  border-top: 1px solid #ddd;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  z-index: 100;
+}
+
+.bottom-nav button {
+  background: white;
+  color: #666;
+  margin: 0;
+  border-radius: 0;
+  font-size: 12px;
+}
+
+.bottom-nav button.active {
+  color: #2563eb;
+  font-weight: bold;
+}
+
+label {
+  font-size: 13px;
+  font-weight: bold;
 }
 </style>
 </head>
 
 <body>
 
+<header>
+  <h1>就職活動管理</h1>
+  <p id="todayText"></p>
+</header>
+
+
 <div class="container">
 
-<h1>就職活動管理</h1>
+
+<!-- =====================
+     ホーム
+===================== -->
+
+<section id="homePage" class="page active">
+
+  <div class="section-title">今日の面接</div>
+
+  <div id="todayInterviews"></div>
 
 
-<div class="card">
+  <div class="section-title">今後の面接</div>
 
-<h2>企業を登録</h2>
+  <div id="upcomingInterviews"></div>
 
-<label>企業名</label>
-<input id="companyName" type="text" placeholder="例：株式会社〇〇">
 
-<label>職種</label>
-<input id="jobType" type="text" placeholder="例：キャリアアドバイザー">
+  <div class="section-title">選考状況</div>
 
-<label>ステータス</label>
+  <div class="stats">
 
-<select id="status">
+    <div class="stat">
+      <div class="stat-label">応募・書類選考</div>
+      <div class="stat-number" id="selectionCount">0</div>
+    </div>
 
-<option value="応募">応募</option>
-<option value="書類選考">書類選考</option>
-<option value="一次面接">一次面接</option>
-<option value="二次面接">二次面接</option>
-<option value="最終面接">最終面接</option>
-<option value="面接結果待ち">面接結果待ち</option>
-<option value="内定">内定</option>
-<option value="不合格">不合格</option>
-<option value="辞退">辞退</option>
+    <div class="stat">
+      <div class="stat-label">面接中</div>
+      <div class="stat-number" id="interviewCount">0</div>
+    </div>
 
-</select>
+    <div class="stat">
+      <div class="stat-label">結果待ち</div>
+      <div class="stat-number" id="waitingCount">0</div>
+    </div>
 
-<label>求人媒体</label>
-<input id="media" type="text" placeholder="例：doda">
+    <div class="stat">
+      <div class="stat-label">内定</div>
+      <div class="stat-number" id="offerCount">0</div>
+    </div>
 
-<button id="addCompanyButton">企業を登録</button>
+  </div>
+
+</section>
+
+
+
+<!-- =====================
+     企業一覧
+===================== -->
+
+<section id="companiesPage" class="page">
+
+  <div class="section-title">企業一覧</div>
+
+  <div class="card">
+    <div id="companyList"></div>
+  </div>
+
+</section>
+
+
+
+<!-- =====================
+     企業登録
+===================== -->
+
+<section id="addCompanyPage" class="page">
+
+  <div class="section-title">企業を登録</div>
+
+  <div class="card">
+
+    <label>企業名</label>
+    <input id="companyName" type="text" placeholder="例：株式会社〇〇">
+
+    <label>職種</label>
+    <input id="jobType" type="text" placeholder="例：キャリアアドバイザー">
+
+    <label>ステータス</label>
+
+    <select id="status">
+
+      <option value="応募">応募</option>
+      <option value="書類選考">書類選考</option>
+      <option value="一次面接">一次面接</option>
+      <option value="二次面接">二次面接</option>
+      <option value="最終面接">最終面接</option>
+      <option value="面接結果待ち">面接結果待ち</option>
+      <option value="内定">内定</option>
+      <option value="不合格">不合格</option>
+      <option value="辞退">辞退</option>
+
+    </select>
+
+
+    <label>求人媒体</label>
+
+    <input
+      id="media"
+      type="text"
+      placeholder="例：doda"
+    >
+
+
+    <button id="addCompanyButton">
+      企業を登録
+    </button>
+
+  </div>
+
+</section>
+
+
+
+<!-- =====================
+     面接登録
+===================== -->
+
+<section id="addInterviewPage" class="page">
+
+  <div class="section-title">面接を登録</div>
+
+  <div class="card">
+
+    <label>企業</label>
+
+    <select id="interviewCompany"></select>
+
+
+    <label>面接回数</label>
+
+    <select id="interviewRound">
+
+      <option value="一次面接">一次面接</option>
+      <option value="二次面接">二次面接</option>
+      <option value="最終面接">最終面接</option>
+
+    </select>
+
+
+    <label>面接日</label>
+
+    <input
+      id="interviewDate"
+      type="date"
+    >
+
+
+    <label>面接時間</label>
+
+    <input
+      id="interviewTime"
+      type="time"
+    >
+
+
+    <label>WEB面接URL</label>
+
+    <input
+      id="interviewUrl"
+      type="url"
+      placeholder="https://..."
+    >
+
+
+    <button id="addInterviewButton">
+      面接を登録
+    </button>
+
+  </div>
+
+</section>
+
 
 </div>
 
 
 
-<div class="card">
+<!-- =====================
+     下部ナビ
+===================== -->
 
-<h2>面接を登録</h2>
+<nav class="bottom-nav">
 
-<label>企業</label>
+  <button id="navHome" class="active">
+    ホーム
+  </button>
 
-<select id="interviewCompany">
-<option value="">企業を選択してください</option>
-</select>
+  <button id="navCompanies">
+    企業一覧
+  </button>
 
+  <button id="navAddCompany">
+    ＋企業
+  </button>
 
-<label>面接回数</label>
+  <button id="navAddInterview">
+    ＋面接
+  </button>
 
-<select id="interviewRound">
+</nav>
 
-<option value="一次面接">一次面接</option>
-<option value="二次面接">二次面接</option>
-<option value="最終面接">最終面接</option>
-
-</select>
-
-
-<label>面接日</label>
-
-<input id="interviewDate" type="date">
-
-
-<label>面接時間</label>
-
-<input id="interviewTime" type="time">
-
-
-<label>WEB面接URL</label>
-
-<input
-id="interviewUrl"
-type="url"
-placeholder="https://..."
->
-
-
-<button id="addInterviewButton">
-面接を登録
-</button>
-
-</div>
-
-
-
-<div class="card">
-
-<h2>企業一覧</h2>
-
-<div id="companyList"></div>
-
-</div>
-
-
-
-<div class="card">
-
-<h2>面接予定</h2>
-
-<div id="interviewList"></div>
-
-</div>
-
-</div>
 
 
 <script>
 
 
-/* =========================
-   データ読み込み
-========================= */
+/* =====================
+   データ
+===================== */
 
 let companies =
 JSON.parse(
@@ -205,106 +451,220 @@ JSON.parse(
 
 
 
-/* =========================
-   企業登録
-========================= */
+/* =====================
+   ページ切り替え
+===================== */
 
-document
-.getElementById("addCompanyButton")
-.addEventListener("click", function() {
+function showPage(pageId) {
 
-
-  const name =
   document
-  .getElementById("companyName")
-  .value
-  .trim();
+    .querySelectorAll(".page")
+    .forEach(function(page) {
+
+      page.classList.remove("active");
+
+    });
 
 
-  const jobType =
   document
-  .getElementById("jobType")
-  .value
-  .trim();
+    .getElementById(pageId)
+    .classList.add("active");
 
 
-  const status =
   document
-  .getElementById("status")
-  .value;
+    .querySelectorAll(".bottom-nav button")
+    .forEach(function(button) {
+
+      button.classList.remove("active");
+
+    });
 
 
-  const media =
-  document
-  .getElementById("media")
-  .value
-  .trim();
+  if (pageId === "homePage") {
 
+    document
+      .getElementById("navHome")
+      .classList.add("active");
 
-  if (name === "") {
-
-    alert("企業名を入力してください");
-
-    return;
+    renderHome();
 
   }
 
 
-  companies.push({
+  if (pageId === "companiesPage") {
 
-    name: name,
+    document
+      .getElementById("navCompanies")
+      .classList.add("active");
 
-    jobType: jobType,
+    displayCompanies();
 
-    status: status,
+  }
 
-    media: media
+
+  if (pageId === "addCompanyPage") {
+
+    document
+      .getElementById("navAddCompany")
+      .classList.add("active");
+
+  }
+
+
+  if (pageId === "addInterviewPage") {
+
+    document
+      .getElementById("navAddInterview")
+      .classList.add("active");
+
+    updateCompanySelect();
+
+  }
+
+}
+
+
+
+/* =====================
+   ナビ
+===================== */
+
+document
+  .getElementById("navHome")
+  .addEventListener("click", function() {
+
+    showPage("homePage");
 
   });
 
 
-  localStorage.setItem(
-    "companies",
-    JSON.stringify(companies)
-  );
+document
+  .getElementById("navCompanies")
+  .addEventListener("click", function() {
+
+    showPage("companiesPage");
+
+  });
 
 
-  document
-  .getElementById("companyName")
-  .value = "";
+document
+  .getElementById("navAddCompany")
+  .addEventListener("click", function() {
+
+    showPage("addCompanyPage");
+
+  });
 
 
-  document
-  .getElementById("jobType")
-  .value = "";
+document
+  .getElementById("navAddInterview")
+  .addEventListener("click", function() {
 
+    showPage("addInterviewPage");
 
-  document
-  .getElementById("media")
-  .value = "";
-
-
-  displayCompanies();
-
-  updateCompanySelect();
-
-
-  alert("企業を登録しました");
-
-});
+  });
 
 
 
-/* =========================
-   企業選択欄
-========================= */
+/* =====================
+   企業登録
+===================== */
+
+document
+  .getElementById("addCompanyButton")
+  .addEventListener("click", function() {
+
+
+    const name =
+      document
+        .getElementById("companyName")
+        .value
+        .trim();
+
+
+    const jobType =
+      document
+        .getElementById("jobType")
+        .value
+        .trim();
+
+
+    const status =
+      document
+        .getElementById("status")
+        .value;
+
+
+    const media =
+      document
+        .getElementById("media")
+        .value
+        .trim();
+
+
+    if (name === "") {
+
+      alert("企業名を入力してください");
+
+      return;
+
+    }
+
+
+    companies.push({
+
+      name: name,
+
+      jobType: jobType,
+
+      status: status,
+
+      media: media
+
+    });
+
+
+    localStorage.setItem(
+      "companies",
+      JSON.stringify(companies)
+    );
+
+
+    document
+      .getElementById("companyName")
+      .value = "";
+
+
+    document
+      .getElementById("jobType")
+      .value = "";
+
+
+    document
+      .getElementById("media")
+      .value = "";
+
+
+    alert("企業を登録しました");
+
+
+    updateCompanySelect();
+
+    showPage("companiesPage");
+
+  });
+
+
+
+/* =====================
+   企業選択
+===================== */
 
 function updateCompanySelect() {
 
-
   const select =
-  document
-  .getElementById("interviewCompany");
+    document
+      .getElementById("interviewCompany");
 
 
   select.innerHTML = "";
@@ -313,12 +673,12 @@ function updateCompanySelect() {
   if (companies.length === 0) {
 
     const option =
-    document.createElement("option");
+      document.createElement("option");
 
     option.value = "";
 
     option.textContent =
-    "先に企業を登録してください";
+      "先に企業を登録してください";
 
     select.appendChild(option);
 
@@ -329,9 +689,8 @@ function updateCompanySelect() {
 
   companies.forEach(function(company) {
 
-
     const option =
-    document.createElement("option");
+      document.createElement("option");
 
 
     option.value = company.name;
@@ -347,137 +706,138 @@ function updateCompanySelect() {
 
 
 
-/* =========================
+/* =====================
    面接登録
-========================= */
+===================== */
 
 document
-.getElementById("addInterviewButton")
-.addEventListener("click", function() {
+  .getElementById("addInterviewButton")
+  .addEventListener("click", function() {
 
 
-  const companyName =
-  document
-  .getElementById("interviewCompany")
-  .value;
+    const companyName =
+      document
+        .getElementById("interviewCompany")
+        .value;
 
 
-  const round =
-  document
-  .getElementById("interviewRound")
-  .value;
+    const round =
+      document
+        .getElementById("interviewRound")
+        .value;
 
 
-  const date =
-  document
-  .getElementById("interviewDate")
-  .value;
+    const date =
+      document
+        .getElementById("interviewDate")
+        .value;
 
 
-  const time =
-  document
-  .getElementById("interviewTime")
-  .value;
+    const time =
+      document
+        .getElementById("interviewTime")
+        .value;
 
 
-  const url =
-  document
-  .getElementById("interviewUrl")
-  .value
-  .trim();
+    const url =
+      document
+        .getElementById("interviewUrl")
+        .value
+        .trim();
 
 
-  if (companyName === "") {
+    if (companyName === "") {
 
-    alert("企業を選択してください");
+      alert("企業を選択してください");
 
-    return;
+      return;
 
-  }
-
-
-  if (date === "") {
-
-    alert("面接日を入力してください");
-
-    return;
-
-  }
+    }
 
 
-  if (time === "") {
+    if (date === "") {
 
-    alert("面接時間を入力してください");
+      alert("面接日を入力してください");
 
-    return;
+      return;
 
-  }
-
-
-  if (url === "") {
-
-    alert("WEB面接URLを入力してください");
-
-    return;
-
-  }
+    }
 
 
-  interviews.push({
+    if (time === "") {
 
-    companyName: companyName,
+      alert("面接時間を入力してください");
 
-    round: round,
+      return;
 
-    date: date,
+    }
 
-    time: time,
 
-    url: url
+    if (url === "") {
+
+      alert("WEB面接URLを入力してください");
+
+      return;
+
+    }
+
+
+    interviews.push({
+
+      companyName: companyName,
+
+      round: round,
+
+      date: date,
+
+      time: time,
+
+      url: url
+
+    });
+
+
+    localStorage.setItem(
+      "interviews",
+      JSON.stringify(interviews)
+    );
+
+
+    document
+      .getElementById("interviewDate")
+      .value = "";
+
+
+    document
+      .getElementById("interviewTime")
+      .value = "";
+
+
+    document
+      .getElementById("interviewUrl")
+      .value = "";
+
+
+    alert("面接を登録しました");
+
+
+    renderHome();
+
+    showPage("homePage");
 
   });
 
 
-  localStorage.setItem(
-    "interviews",
-    JSON.stringify(interviews)
-  );
 
-
-  document
-  .getElementById("interviewDate")
-  .value = "";
-
-
-  document
-  .getElementById("interviewTime")
-  .value = "";
-
-
-  document
-  .getElementById("interviewUrl")
-  .value = "";
-
-
-  displayInterviews();
-
-
-  alert("面接を登録しました");
-
-});
-
-
-
-/* =========================
+/* =====================
    企業一覧
-========================= */
+===================== */
 
 function displayCompanies() {
 
-
   const list =
-  document
-  .getElementById("companyList");
+    document
+      .getElementById("companyList");
 
 
   list.innerHTML = "";
@@ -486,7 +846,7 @@ function displayCompanies() {
   if (companies.length === 0) {
 
     list.innerHTML =
-    "<p>まだ企業がありません</p>";
+      '<div class="empty">まだ企業がありません</div>';
 
     return;
 
@@ -497,7 +857,7 @@ function displayCompanies() {
 
 
     const div =
-    document.createElement("div");
+      document.createElement("div");
 
 
     div.className = "company";
@@ -505,18 +865,23 @@ function displayCompanies() {
 
     div.innerHTML =
 
-    "<strong>" +
-    company.name +
-    "</strong>" +
+      '<div class="company-name">' +
+      company.name +
+      '</div>' +
 
-    "<br>職種：" +
-    company.jobType +
+      '<div class="meta">' +
+      '職種：' +
+      (company.jobType || "未登録") +
+      '</div>' +
 
-    "<br>ステータス：" +
-    company.status +
+      '<div class="meta">' +
+      '求人媒体：' +
+      (company.media || "未登録") +
+      '</div>' +
 
-    "<br>求人媒体：" +
-    company.media;
+      '<span class="status">' +
+      company.status +
+      '</span>';
 
 
     list.appendChild(div);
@@ -527,110 +892,250 @@ function displayCompanies() {
 
 
 
-/* =========================
-   面接一覧
-========================= */
+/* =====================
+   面接表示
+===================== */
 
-function displayInterviews() {
-
-
-  const list =
-  document
-  .getElementById("interviewList");
+function createInterviewCard(interview) {
 
 
-  list.innerHTML = "";
+  const div =
+    document.createElement("div");
 
 
-  if (interviews.length === 0) {
+  div.className = "interview";
 
-    list.innerHTML =
-    "<p>面接予定はありません</p>";
 
-    return;
+  div.innerHTML =
+
+    '<div class="interview-company">' +
+    (interview.companyName || "企業名未登録") +
+    '</div>' +
+
+    '<div class="interview-date">' +
+    interview.date +
+    ' ' +
+    interview.time +
+    '</div>' +
+
+    '<div class="interview-round">' +
+    interview.round +
+    '</div>';
+
+
+  if (interview.url) {
+
+    const link =
+      document.createElement("a");
+
+    link.className = "web-button";
+
+    link.href = interview.url;
+
+    link.target = "_blank";
+
+    link.rel = "noopener noreferrer";
+
+    link.textContent = "WEB面接を開く";
+
+    div.appendChild(link);
 
   }
 
 
-  interviews
-  .slice()
-  .sort(function(a, b) {
-
-    return (
-      a.date + a.time
-    ).localeCompare(
-      b.date + b.time
-    );
-
-  })
-  .forEach(function(interview) {
-
-
-    const div =
-    document.createElement("div");
-
-
-    div.className = "interview";
-
-
-    div.innerHTML =
-
-    "<strong>" +
-    interview.companyName +
-    "</strong>" +
-
-    "<br>" +
-
-    interview.round +
-
-    "<br>" +
-
-    interview.date +
-    " " +
-    interview.time;
-
-
-    const link =
-    document.createElement("a");
-
-
-    link.href =
-    interview.url;
-
-
-    link.target =
-    "_blank";
-
-
-    link.rel =
-    "noopener noreferrer";
-
-
-    link.textContent =
-    "WEB面接を開く";
-
-
-    div.appendChild(link);
-
-
-    list.appendChild(div);
-
-  });
+  return div;
 
 }
 
 
 
-/* =========================
+/* =====================
+   ホーム
+===================== */
+
+function renderHome() {
+
+
+  const now =
+    new Date();
+
+
+  document
+    .getElementById("todayText")
+    .textContent =
+      now.toLocaleDateString(
+        "ja-JP",
+        {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          weekday: "short"
+        }
+      );
+
+
+  const year =
+    now.getFullYear();
+
+
+  const month =
+    String(now.getMonth() + 1)
+      .padStart(2, "0");
+
+
+  const day =
+    String(now.getDate())
+      .padStart(2, "0");
+
+
+  const today =
+    year + "-" + month + "-" + day;
+
+
+  const todayArea =
+    document
+      .getElementById("todayInterviews");
+
+
+  const upcomingArea =
+    document
+      .getElementById("upcomingInterviews");
+
+
+  todayArea.innerHTML = "";
+
+  upcomingArea.innerHTML = "";
+
+
+  const todayList =
+    interviews
+      .filter(function(interview) {
+
+        return interview.date === today;
+
+      })
+      .sort(function(a, b) {
+
+        return a.time.localeCompare(b.time);
+
+      });
+
+
+  const upcomingList =
+    interviews
+      .filter(function(interview) {
+
+        return interview.date > today;
+
+      })
+      .sort(function(a, b) {
+
+        return (
+          a.date + a.time
+        ).localeCompare(
+          b.date + b.time
+        );
+
+      });
+
+
+  if (todayList.length === 0) {
+
+    todayArea.innerHTML =
+      '<div class="card empty">今日の面接はありません</div>';
+
+  } else {
+
+    todayList.forEach(function(interview) {
+
+      todayArea.appendChild(
+        createInterviewCard(interview)
+      );
+
+    });
+
+  }
+
+
+  if (upcomingList.length === 0) {
+
+    upcomingArea.innerHTML =
+      '<div class="card empty">今後の面接はありません</div>';
+
+  } else {
+
+    upcomingList
+      .slice(0, 5)
+      .forEach(function(interview) {
+
+        upcomingArea.appendChild(
+          createInterviewCard(interview)
+        );
+
+      });
+
+  }
+
+
+  document
+    .getElementById("selectionCount")
+    .textContent =
+      companies.filter(function(company) {
+
+        return (
+          company.status === "応募" ||
+          company.status === "書類選考"
+        );
+
+      }).length;
+
+
+  document
+    .getElementById("interviewCount")
+    .textContent =
+      companies.filter(function(company) {
+
+        return (
+          company.status === "一次面接" ||
+          company.status === "二次面接" ||
+          company.status === "最終面接"
+        );
+
+      }).length;
+
+
+  document
+    .getElementById("waitingCount")
+    .textContent =
+      companies.filter(function(company) {
+
+        return company.status === "面接結果待ち";
+
+      }).length;
+
+
+  document
+    .getElementById("offerCount")
+    .textContent =
+      companies.filter(function(company) {
+
+        return company.status === "内定";
+
+      }).length;
+
+}
+
+
+
+/* =====================
    初期表示
-========================= */
+===================== */
 
 updateCompanySelect();
 
 displayCompanies();
 
-displayInterviews();
-
+renderHome();
 
 </script>
 
