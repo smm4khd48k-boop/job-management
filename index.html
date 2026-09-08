@@ -122,43 +122,47 @@
       box-shadow: var(--shadow);
       cursor: pointer;
     }
-    .term-row { display: flex; align-items: center; gap: 12px; }
-    .term-main { min-width: 0; flex: 1; }
-    .term { font-size: 14px; font-weight: 700; }
-    .term-subrow {
+    .term-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: auto minmax(0, 1fr) 68px minmax(0, 34%) 18px;
       align-items: center;
-      column-gap: 8px;
+      gap: 8px;
+    }
+    .term-main { min-width: 0; }
+    .term { font-size: 14px; font-weight: 700; }
+    .alias {
       min-width: 0;
       margin-top: 3px;
-    }
-    .alias {
-      grid-column: 1;
-      min-width: 0;
       color: var(--sub);
       font-size: 10px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .category-side {
+      width: 68px;
+      min-width: 68px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     .category-inline {
-      grid-column: 2;
-      width: 76px;
+      width: 68px;
       text-align: center;
-      color: var(--cat-fg);
-      background: var(--cat-bg);
+      color: #5a4300;
+      background: #fff2cc;
+      border: 1px solid #b08a2e;
       border-radius: 999px;
       padding: 2px 6px;
       font-size: 9px;
+      font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       box-sizing: border-box;
     }
     .memo-side {
-      flex: 0 0 48%;
-      max-width: 48%;
+      width: 100%;
       min-width: 0;
       display: flex;
       flex-direction: column;
@@ -180,7 +184,7 @@
     }
     .term-card.selecting { cursor: pointer; }
     .term-card.selected { outline: 2px solid var(--text); }
-    .select-box { width: 22px; height: 22px; flex: 0 0 22px; accent-color: var(--text); }
+    .select-box { width: 22px; height: 22px; accent-color: var(--text); }
     .term-card .reading { display: none; }
     .reading { color: var(--sub); font-size: 11px; margin-top: 3px; }
     .category {
@@ -192,7 +196,7 @@
       padding: 5px 9px;
       font-size: 10px;
     }
-    .arrow { color: #c7c7cc; font-size: 25px; align-self: center; }
+    .arrow { grid-column: 5; color: #c7c7cc; font-size: 25px; align-self: center; }
     .list-actions { display: flex; align-items: center; gap: 6px; }
     .select-btn, .bulk-delete-btn, .done-btn { border: 0; border-radius: 999px; padding: 6px 9px; font-size: 11px; cursor: pointer; }
     .select-btn, .done-btn { background: #f0f0f2; color: var(--text); }
@@ -387,26 +391,6 @@
     localStorage.setItem(KEY, JSON.stringify(terms));
   }
 
-  function categoryColors(category) {
-    const palette = [
-      ["#eee6ff", "#6b35b5"],
-      ["#fff0cf", "#8a5a00"],
-      ["#e5f7ec", "#18794e"],
-      ["#e6f0ff", "#2d63b8"],
-      ["#ffe8ed", "#b4234d"],
-      ["#e9e9ee", "#4b4b55"],
-      ["#e5f7f7", "#16706f"],
-      ["#f3e8ff", "#7a3db8"]
-    ];
-    const key = String(category || "").trim();
-    let hash = 0;
-    for (let i = 0; i < key.length; i++) {
-      hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-    }
-    const [bg, fg] = palette[hash % palette.length];
-    return `--cat-bg:${bg};--cat-fg:${fg};`;
-  }
-
   function escapeHtml(value = "") {
     return String(value).replace(/[&<>"']/g, c => ({
       "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
@@ -518,12 +502,14 @@
           ${selectMode ? `<input class="select-box" type="checkbox" ${selectedIds.has(t.id) ? "checked" : ""} aria-label="${escapeHtml(t.term)}を選択">` : ""}
           <div class="term-main">
             <div class="term">${escapeHtml(t.term)}</div>
-            <div class="term-subrow">
-              ${t.alias ? `<div class="alias">（${escapeHtml(t.alias)}）</div>` : ""}
-              ${t.category ? `<span class="category-inline" style="${categoryColors(t.category)}">${escapeHtml(t.category)}</span>` : ""}
-            </div>
+            ${t.alias ? `<div class="alias">（${escapeHtml(t.alias)}）</div>` : ""}
           </div>
-          ${t.memo ? `<div class="memo-side">${String(t.memo).split(/\r?\n/).filter(Boolean).map(m => `<span class="memo-item">${escapeHtml(m)}</span>`).join("")}</div>` : ""}
+          <div class="category-side">
+            ${t.category ? `<span class="category-inline">${escapeHtml(t.category)}</span>` : ""}
+          </div>
+          <div class="memo-side">
+            ${t.memo ? String(t.memo).split(/\r?\n/).filter(Boolean).map(m => `<span class="memo-item">${escapeHtml(m)}</span>`).join("") : ""}
+          </div>
           ${!selectMode ? `<div class="arrow">›</div>` : ""}
         </div>
       </div>
