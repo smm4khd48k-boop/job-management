@@ -1,4 +1,4 @@
-const CACHE_NAME = "work-glossary-v1";
+const CACHE_NAME = "work-glossary-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
