@@ -70,6 +70,29 @@
       scrollbar-width: none;
     }
     .filters::-webkit-scrollbar { display: none; }
+    .kana-filters {
+      display: grid;
+      grid-template-columns: repeat(11, minmax(0, 1fr));
+      gap: 4px;
+      margin: 2px 0 8px;
+      padding: 0;
+    }
+    .kana-chip {
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--sub);
+      border-radius: 8px;
+      padding: 6px 2px;
+      font-size: 13px;
+      line-height: 1.2;
+      cursor: pointer;
+      text-align: center;
+    }
+    .kana-chip.active {
+      color: #fff;
+      background: var(--text);
+      border-color: var(--text);
+    }
     .chip {
       flex: 0 0 auto;
       border: 1px solid var(--line);
@@ -206,6 +229,7 @@
   </div>
 
   <div id="filters" class="filters"></div>
+  <div id="kanaFilters" class="kana-filters"></div>
 
   <div class="section-title">
     <h2>用語一覧</h2>
@@ -270,6 +294,7 @@
   const KEY = "workGlossaryTerms_v1";
   let terms = load();
   let selectedCategory = "すべて";
+  let selectedKana = "すべて";
   let editingId = null;
   let viewingId = null;
 
@@ -317,10 +342,46 @@
     });
   }
 
+  function normalizeKana(value = "") {
+    return String(value).trim().replace(/[ァ-ヶ]/g, ch =>
+      String.fromCharCode(ch.charCodeAt(0) - 0x60)
+    );
+  }
+
+  function getKanaGroup(reading = "") {
+    const ch = normalizeKana(reading).charAt(0);
+    if ("あいうえお".includes(ch)) return "あ";
+    if ("かきくけこがぎぐげござじずぜぞ".includes(ch)) return "か";
+    if ("さしすせそざじずぜぞ".includes(ch)) return "さ";
+    if ("たちつてとだぢづでど".includes(ch)) return "た";
+    if ("なにぬねの".includes(ch)) return "な";
+    if ("はひふへほばびぶべぼぱぴぷぺぽ".includes(ch)) return "は";
+    if ("まみむめも".includes(ch)) return "ま";
+    if ("やゆよ".includes(ch)) return "や";
+    if ("らりるれろ".includes(ch)) return "ら";
+    if ("わをん".includes(ch)) return "わ";
+    return "";
+  }
+
+  function renderKanaFilters() {
+    const kanaGroups = ["すべて","あ","か","さ","た","な","は","ま","や","ら","わ"];
+    $("kanaFilters").innerHTML = kanaGroups.map(kana =>
+      `<button class="kana-chip ${kana === selectedKana ? "active" : ""}" data-kana="${kana}">${kana}</button>`
+    ).join("");
+
+    $("kanaFilters").querySelectorAll(".kana-chip").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedKana = btn.dataset.kana;
+        render();
+      });
+    });
+  }
+
   function getFiltered() {
     const q = $("search").value.trim().toLowerCase();
     return terms
       .filter(t => selectedCategory === "すべて" || (t.category || "") === selectedCategory)
+      .filter(t => selectedKana === "すべて" || getKanaGroup(t.reading || t.term) === selectedKana)
       .filter(t => !q || [t.term,t.reading,t.category,t.understanding,t.memo]
         .some(v => String(v || "").toLowerCase().includes(q)))
       .sort((a,b) => {
@@ -332,6 +393,7 @@
 
   function render() {
     renderFilters();
+    renderKanaFilters();
     const filtered = getFiltered();
     $("count").textContent = `${terms.length}件登録`;
     $("resultCount").textContent = `${filtered.length}件`;
