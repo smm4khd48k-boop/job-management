@@ -134,6 +134,7 @@
       margin-top: 3px;
     }
     .alias {
+      grid-column: 1;
       min-width: 0;
       color: var(--sub);
       font-size: 10px;
@@ -142,10 +143,11 @@
       white-space: nowrap;
     }
     .category-inline {
+      grid-column: 2;
       width: 76px;
       text-align: center;
-      color: #8a5a00;
-      background: #fff0cf;
+      color: var(--cat-fg);
+      background: var(--cat-bg);
       border-radius: 999px;
       padding: 2px 6px;
       font-size: 9px;
@@ -385,6 +387,26 @@
     localStorage.setItem(KEY, JSON.stringify(terms));
   }
 
+  function categoryColors(category) {
+    const palette = [
+      ["#eee6ff", "#6b35b5"],
+      ["#fff0cf", "#8a5a00"],
+      ["#e5f7ec", "#18794e"],
+      ["#e6f0ff", "#2d63b8"],
+      ["#ffe8ed", "#b4234d"],
+      ["#e9e9ee", "#4b4b55"],
+      ["#e5f7f7", "#16706f"],
+      ["#f3e8ff", "#7a3db8"]
+    ];
+    const key = String(category || "").trim();
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+      hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+    }
+    const [bg, fg] = palette[hash % palette.length];
+    return `--cat-bg:${bg};--cat-fg:${fg};`;
+  }
+
   function escapeHtml(value = "") {
     return String(value).replace(/[&<>"']/g, c => ({
       "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
@@ -498,7 +520,7 @@
             <div class="term">${escapeHtml(t.term)}</div>
             <div class="term-subrow">
               ${t.alias ? `<div class="alias">（${escapeHtml(t.alias)}）</div>` : ""}
-              ${t.category ? `<span class="category-inline">${escapeHtml(t.category)}</span>` : ""}
+              ${t.category ? `<span class="category-inline" style="${categoryColors(t.category)}">${escapeHtml(t.category)}</span>` : ""}
             </div>
           </div>
           ${t.memo ? `<div class="memo-side">${String(t.memo).split(/\r?\n/).filter(Boolean).map(m => `<span class="memo-item">${escapeHtml(m)}</span>`).join("")}</div>` : ""}
