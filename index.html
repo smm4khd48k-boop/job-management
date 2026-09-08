@@ -124,9 +124,12 @@
     }
     .term-row {
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr) 68px minmax(0, 34%) 18px;
+      grid-template-columns: minmax(0, 1fr) 76px minmax(0, 32%) 18px;
       align-items: center;
       gap: 8px;
+    }
+    .term-card.selecting .term-row {
+      grid-template-columns: 28px minmax(0, 1fr) 76px minmax(0, 32%) 18px;
     }
     .term-main { min-width: 0; }
     .term { font-size: 14px; font-weight: 700; }
@@ -140,18 +143,21 @@
       white-space: nowrap;
     }
     .category-side {
-      width: 68px;
-      min-width: 68px;
+      grid-column: 2;
+      width: 76px;
+      min-width: 76px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
+    .term-card.selecting .category-side { grid-column: 3; }
+    .term-card.selecting .memo-side { grid-column: 4; }
     .category-inline {
-      width: 68px;
+      width: 76px;
       text-align: center;
-      color: #5a4300;
-      background: #fff2cc;
-      border: 1px solid #b08a2e;
+      color: var(--cat-fg);
+      background: var(--cat-bg);
+      border: 1px solid var(--cat-fg);
       border-radius: 999px;
       padding: 2px 6px;
       font-size: 9px;
@@ -162,6 +168,7 @@
       box-sizing: border-box;
     }
     .memo-side {
+      grid-column: 3;
       width: 100%;
       min-width: 0;
       display: flex;
@@ -184,7 +191,14 @@
     }
     .term-card.selecting { cursor: pointer; }
     .term-card.selected { outline: 2px solid var(--text); }
-    .select-box { width: 22px; height: 22px; accent-color: var(--text); }
+    .select-box {
+      grid-column: 1;
+      width: 22px;
+      height: 22px;
+      accent-color: var(--text);
+      justify-self: center;
+    }
+    .term-card.selecting .term-main { grid-column: 2; }
     .term-card .reading { display: none; }
     .reading { color: var(--sub); font-size: 11px; margin-top: 3px; }
     .category {
@@ -196,7 +210,8 @@
       padding: 5px 9px;
       font-size: 10px;
     }
-    .arrow { grid-column: 5; color: #c7c7cc; font-size: 25px; align-self: center; }
+    .arrow { grid-column: 4; color: #c7c7cc; font-size: 25px; align-self: center; }
+    .term-card.selecting .arrow { grid-column: 5; }
     .list-actions { display: flex; align-items: center; gap: 6px; }
     .select-btn, .bulk-delete-btn, .done-btn { border: 0; border-radius: 999px; padding: 6px 9px; font-size: 11px; cursor: pointer; }
     .select-btn, .done-btn { background: #f0f0f2; color: var(--text); }
@@ -391,6 +406,26 @@
     localStorage.setItem(KEY, JSON.stringify(terms));
   }
 
+  function categoryColors(category) {
+    const palette = [
+      ["#E6F4EA", "#185C37"],
+      ["#FFF4CC", "#6B5200"],
+      ["#E8EAF6", "#3949AB"],
+      ["#FCE8E6", "#9B2C2C"],
+      ["#E6F0F8", "#24506F"],
+      ["#F3E8F7", "#6A3D73"],
+      ["#F1ECE4", "#604A2E"],
+      ["#E8F1EE", "#315C50"]
+    ];
+    const key = String(category || "").trim();
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+      hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+    }
+    const [bg, fg] = palette[hash % palette.length];
+    return `--cat-bg:${bg};--cat-fg:${fg};`;
+  }
+
   function escapeHtml(value = "") {
     return String(value).replace(/[&<>"']/g, c => ({
       "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
@@ -505,7 +540,7 @@
             ${t.alias ? `<div class="alias">（${escapeHtml(t.alias)}）</div>` : ""}
           </div>
           <div class="category-side">
-            ${t.category ? `<span class="category-inline">${escapeHtml(t.category)}</span>` : ""}
+            ${t.category ? `<span class="category-inline" style="${categoryColors(t.category)}">${escapeHtml(t.category)}</span>` : ""}
           </div>
           <div class="memo-side">
             ${t.memo ? String(t.memo).split(/\r?\n/).filter(Boolean).map(m => `<span class="memo-item">${escapeHtml(m)}</span>`).join("") : ""}
