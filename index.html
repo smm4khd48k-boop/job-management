@@ -429,6 +429,11 @@
       .filter(t => !q || [t.term,t.reading,t.category,t.memo]
         .some(v => String(v || "").toLowerCase().includes(q)))
       .sort((a,b) => {
+        // 絞り込みなしの「すべて」は登録順（新しいものを上）、
+        // かな絞り込み時はこれまで通り読み方順。
+        if (selectedCategories.length === 0 && selectedKana === "すべて") {
+          return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+        }
         const ar = String(a.reading || a.term || "");
         const br = String(b.reading || b.term || "");
         return ar.localeCompare(br, "ja", { sensitivity: "base" });
