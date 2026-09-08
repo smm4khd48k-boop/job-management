@@ -118,42 +118,49 @@
       border: 0;
       background: var(--card);
       border-radius: 18px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       box-shadow: var(--shadow);
       cursor: pointer;
     }
     .term-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 76px minmax(0, 32%) 18px;
+      grid-template-columns: minmax(0, 40%) 70px minmax(0, 1fr) 18px;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .term-card.selecting .term-row {
-      grid-template-columns: 28px minmax(0, 1fr) 76px minmax(0, 32%) 18px;
+      grid-template-columns: 28px minmax(0, 40%) 70px minmax(0, 1fr) 18px;
     }
     .term-main { min-width: 0; }
-    .term { font-size: 14px; font-weight: 700; }
+    .term { 
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .alias {
       min-width: 0;
-      margin-top: 3px;
+      margin-top: 2px;
       color: var(--sub);
-      font-size: 10px;
+      font-size: 9px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
     .category-side {
       grid-column: 2;
-      width: 76px;
-      min-width: 76px;
+      width: 70px;
+      min-width: 70px;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: flex-start;
+      align-items: flex-end;
+      padding-bottom: 1px;
     }
     .term-card.selecting .category-side { grid-column: 3; }
     .term-card.selecting .memo-side { grid-column: 4; }
     .category-inline {
-      width: 76px;
+      width: 70px;
       text-align: center;
       color: var(--cat-fg);
       background: var(--cat-bg);
@@ -182,8 +189,8 @@
       color: var(--accent);
       background: #edf4ff;
       border-radius: 999px;
-      padding: 5px 9px;
-      font-size: 10px;
+      padding: 3px 7px;
+      font-size: 9px;
       box-sizing: border-box;
       overflow: hidden;
       text-overflow: ellipsis;
