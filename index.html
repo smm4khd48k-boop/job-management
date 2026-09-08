@@ -122,8 +122,17 @@
       box-shadow: var(--shadow);
       cursor: pointer;
     }
-    .term-row { display: flex; justify-content: space-between; gap: 14px; }
+    .term-row { display: flex; align-items: center; gap: 12px; }
+    .term-main { min-width: 0; flex: 1; }
     .term { font-size: 19px; font-weight: 700; }
+    .memo-side {
+      flex: 0 0 auto; max-width: 42%; color: var(--accent); background: #edf4ff;
+      border-radius: 999px; padding: 5px 9px; font-size: 12px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .term-card.selecting { cursor: pointer; }
+    .term-card.selected { outline: 2px solid var(--text); }
+    .select-box { width: 22px; height: 22px; flex: 0 0 22px; accent-color: var(--text); }
     .reading { color: var(--sub); font-size: 13px; margin-top: 4px; }
     .category {
       display: inline-block;
@@ -135,6 +144,11 @@
       font-size: 12px;
     }
     .arrow { color: #c7c7cc; font-size: 25px; align-self: center; }
+    .list-actions { display: flex; align-items: center; gap: 6px; }
+    .select-btn, .bulk-delete-btn, .done-btn { border: 0; border-radius: 999px; padding: 6px 9px; font-size: 11px; cursor: pointer; }
+    .select-btn, .done-btn { background: #f0f0f2; color: var(--text); }
+    .bulk-delete-btn { background: #fff0ef; color: var(--danger); }
+    .bulk-delete-btn:disabled { opacity: .45; cursor: default; }
     .empty {
       background: var(--card);
       border-radius: 18px;
@@ -233,7 +247,12 @@
 
   <div class="section-title">
     <h2>用語一覧</h2>
-    <span id="resultCount"></span>
+    <div class="list-actions">
+      <span id="resultCount"></span>
+      <button class="select-btn" id="selectModeBtn" type="button">選択</button>
+      <button class="bulk-delete-btn" id="bulkDeleteBtn" type="button" disabled>選択削除</button>
+      <button class="done-btn" id="doneSelectBtn" type="button" style="display:none">完了</button>
+    </div>
   </div>
   <div id="list" class="list"></div>
 </div>
@@ -258,10 +277,6 @@
       <div class="field">
         <label for="category">カテゴリ</label>
         <input id="category" placeholder="自由に入力">
-      </div>
-      <div class="field">
-        <label for="understanding">自分なりの理解</label>
-        <textarea id="understanding"></textarea>
       </div>
       <div class="field">
         <label for="memo">メモ</label>
@@ -297,6 +312,8 @@
   let selectedKana = "すべて";
   let editingId = null;
   let viewingId = null;
+  let selectMode = false;
+  let selectedIds = new Set();
 
   const $ = id => document.getElementById(id);
 
@@ -304,7 +321,9 @@
     try {
       const raw = localStorage.getItem(KEY);
       const data = raw ? JSON.parse(raw) : [];
-      return Array.isArray(data) ? data : [];
+      return Array.isArray(data)
+        ? data.map(({ understanding, ...term }) => term)
+        : [];
     } catch {
       return [];
     }
@@ -382,7 +401,7 @@
     return terms
       .filter(t => selectedCategory === "すべて" || (t.category || "") === selectedCategory)
       .filter(t => selectedKana === "すべて" || getKanaGroup(t.reading || t.term) === selectedKana)
-      .filter(t => !q || [t.term,t.reading,t.category,t.understanding,t.memo]
+      .filter(t => !q || [t.term,t.reading,t.category,t.memo]
         .some(v => String(v || "").toLowerCase().includes(q)))
       .sort((a,b) => {
         const ar = String(a.reading || a.term || "");
@@ -397,6 +416,10 @@
     const filtered = getFiltered();
     $("count").textContent = `${terms.length}件登録`;
     $("resultCount").textContent = `${filtered.length}件`;
+    $("selectModeBtn").style.display = selectMode ? "none" : "";
+    $("doneSelectBtn").style.display = selectMode ? "" : "none";
+    $("bulkDeleteBtn").disabled = selectedIds.size === 0;
+    $("bulkDeleteBtn").textContent = selectedIds.size ? `選択削除（${selectedIds.size}）` : "選択削除";
 
     if (!filtered.length) {
       $("list").innerHTML = `<div class="empty">${terms.length ? "条件に一致する用語がありません。" : "まだ用語が登録されていません。<br>右下の「＋」から追加できます。"}</div>`;
@@ -404,20 +427,43 @@
     }
 
     $("list").innerHTML = filtered.map(t => `
-      <button class="term-card" data-id="${t.id}">
+      <div class="term-card ${selectMode ? "selecting" : ""} ${selectedIds.has(t.id) ? "selected" : ""}" data-id="${t.id}" role="button" tabindex="0">
         <div class="term-row">
-          <div>
+          ${selectMode ? `<input class="select-box" type="checkbox" ${selectedIds.has(t.id) ? "checked" : ""} aria-label="${escapeHtml(t.term)}を選択">` : ""}
+          <div class="term-main">
             <div class="term">${escapeHtml(t.term)}</div>
             ${t.reading ? `<div class="reading">${escapeHtml(t.reading)}</div>` : ""}
-            ${t.memo ? `<span class="category">${escapeHtml(t.memo)}</span>` : ""}
           </div>
-          <div class="arrow">›</div>
+          ${t.memo ? `<div class="memo-side">${escapeHtml(t.memo)}</div>` : ""}
+          ${!selectMode ? `<div class="arrow">›</div>` : ""}
         </div>
-      </button>
+      </div>
     `).join("");
 
     $("list").querySelectorAll(".term-card").forEach(card => {
-      card.addEventListener("click", () => openDetail(card.dataset.id));
+      const toggle = () => {
+        const id = card.dataset.id;
+        if (!selectMode) { openDetail(id); return; }
+        if (selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        render();
+      };
+      card.addEventListener("click", e => {
+        if (e.target.classList.contains("select-box")) return;
+        toggle();
+      });
+      card.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+      });
+    });
+
+    $("list").querySelectorAll(".select-box").forEach(box => {
+      box.addEventListener("change", e => {
+        const id = e.target.closest(".term-card").dataset.id;
+        if (e.target.checked) selectedIds.add(id);
+        else selectedIds.delete(id);
+        render();
+      });
     });
   }
 
@@ -428,7 +474,6 @@
     $("term").value = t?.term || "";
     $("reading").value = t?.reading || "";
     $("category").value = t?.category || "";
-    $("understanding").value = t?.understanding || "";
     $("memo").value = t?.memo || "";
     $("formModal").classList.add("show");
     setTimeout(() => $("term").focus(), 50);
@@ -447,7 +492,6 @@
       <div class="detail-term">${escapeHtml(t.term)}</div>
       ${t.reading ? `<div class="detail-reading">${escapeHtml(t.reading)}</div>` : ""}
       ${t.category ? `<p><span class="detail-label">カテゴリ</span><br>${escapeHtml(t.category)}</p>` : ""}
-      ${t.understanding ? `<p><span class="detail-label">自分なりの理解</span><br>${escapeHtml(t.understanding)}</p>` : ""}
       ${t.memo ? `<p><span class="detail-label">メモ</span><br>${escapeHtml(t.memo)}</p>` : ""}
       <div class="date">登録日：${formatDate(t.createdAt)}</div>
     `;
@@ -474,7 +518,6 @@
       term,
       reading: $("reading").value.trim(),
       category: $("category").value.trim(),
-      understanding: $("understanding").value.trim(),
       memo: $("memo").value.trim()
     };
 
@@ -491,6 +534,29 @@
 
     save();
     closeForm();
+    render();
+  });
+
+  $("selectModeBtn").addEventListener("click", () => {
+    selectMode = true;
+    selectedIds.clear();
+    render();
+  });
+
+  $("doneSelectBtn").addEventListener("click", () => {
+    selectMode = false;
+    selectedIds.clear();
+    render();
+  });
+
+  $("bulkDeleteBtn").addEventListener("click", () => {
+    if (!selectedIds.size) return;
+    const count = selectedIds.size;
+    if (!confirm(`${count}件の用語を削除しますか？`)) return;
+    terms = terms.filter(t => !selectedIds.has(t.id));
+    selectedIds.clear();
+    selectMode = false;
+    save();
     render();
   });
 
