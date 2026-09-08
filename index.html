@@ -125,6 +125,30 @@
     .term-row { display: flex; align-items: center; gap: 12px; }
     .term-main { min-width: 0; flex: 1; }
     .term { font-size: 14px; font-weight: 700; }
+    .term-subrow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      margin-top: 3px;
+    }
+    .alias {
+      min-width: 0;
+      color: var(--sub);
+      font-size: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .category-inline {
+      flex: 0 0 auto;
+      color: var(--accent);
+      background: #edf4ff;
+      border-radius: 999px;
+      padding: 2px 6px;
+      font-size: 9px;
+      white-space: nowrap;
+    }
     .memo-side {
       flex: 0 0 48%;
       max-width: 48%;
@@ -237,6 +261,7 @@
     .detail p { white-space: pre-wrap; margin: 7px 0 18px; line-height: 1.7; }
     .detail-label { color: var(--sub); font-size: 10px; font-weight: 700; }
     .detail-term { font-size: 29px; font-weight: 800; margin: 2px 0 4px; }
+    .detail-alias { color: var(--sub); font-size: 13px; margin-bottom: 3px; }
     .detail-reading { color: var(--sub); }
     .date { color: var(--sub); font-size: 10px; }
     @media (min-width: 700px) {
@@ -291,6 +316,10 @@
       <div class="field">
         <label for="reading">読み方</label>
         <input id="reading">
+      </div>
+      <div class="field">
+        <label for="alias">別名</label>
+        <input id="alias" placeholder="別名・略称など">
       </div>
       <div class="field">
         <label for="category">カテゴリ</label>
@@ -426,7 +455,7 @@
     return terms
       .filter(t => selectedCategories.length === 0 || selectedCategories.includes((t.category || "").trim()))
       .filter(t => selectedKana === "すべて" || getKanaGroup(t.reading || t.term) === selectedKana)
-      .filter(t => !q || [t.term,t.reading,t.category,t.memo]
+      .filter(t => !q || [t.term,t.reading,t.alias,t.category,t.memo]
         .some(v => String(v || "").toLowerCase().includes(q)))
       .sort((a,b) => {
         // 絞り込みなしの「すべて」は登録順（新しいものを上）、
@@ -462,7 +491,10 @@
           ${selectMode ? `<input class="select-box" type="checkbox" ${selectedIds.has(t.id) ? "checked" : ""} aria-label="${escapeHtml(t.term)}を選択">` : ""}
           <div class="term-main">
             <div class="term">${escapeHtml(t.term)}</div>
-            ${t.reading ? `<div class="reading">${escapeHtml(t.reading)}</div>` : ""}
+            <div class="term-subrow">
+              ${t.alias ? `<div class="alias">${escapeHtml(t.alias)}</div>` : ""}
+              ${t.category ? `<span class="category-inline">${escapeHtml(t.category)}</span>` : ""}
+            </div>
           </div>
           ${t.memo ? `<div class="memo-side">${String(t.memo).split(/\r?\n/).filter(Boolean).map(m => `<span class="memo-item">${escapeHtml(m)}</span>`).join("")}</div>` : ""}
           ${!selectMode ? `<div class="arrow">›</div>` : ""}
@@ -503,6 +535,7 @@
     const t = id ? terms.find(x => x.id === id) : null;
     $("term").value = t?.term || "";
     $("reading").value = t?.reading || "";
+    $("alias").value = t?.alias || "";
     $("category").value = t?.category || "";
     $("memo").value = t?.memo || "";
     $("formModal").classList.add("show");
@@ -520,6 +553,7 @@
     if (!t) return;
     $("detail").innerHTML = `
       <div class="detail-term">${escapeHtml(t.term)}</div>
+      ${t.alias ? `<div class="detail-alias">${escapeHtml(t.alias)}</div>` : ""}
       ${t.reading ? `<div class="detail-reading">${escapeHtml(t.reading)}</div>` : ""}
       ${t.category ? `<p><span class="detail-label">カテゴリ</span><br>${escapeHtml(t.category)}</p>` : ""}
       ${t.memo ? `<p><span class="detail-label">メモ</span><br>${String(t.memo).split(/\r?\n/).filter(Boolean).map(m => escapeHtml(m)).join("<br>")}</p>` : ""}
@@ -547,6 +581,7 @@
     const payload = {
       term,
       reading: $("reading").value.trim(),
+      alias: $("alias").value.trim(),
       category: $("category").value.trim(),
       memo: $("memo").value.trim()
     };
