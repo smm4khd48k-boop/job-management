@@ -126,9 +126,10 @@
     .term-main { min-width: 0; flex: 1; }
     .term { font-size: 14px; font-weight: 700; }
     .term-subrow {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      gap: 6px;
+      column-gap: 8px;
       min-width: 0;
       margin-top: 3px;
     }
@@ -141,13 +142,17 @@
       white-space: nowrap;
     }
     .category-inline {
-      flex: 0 0 auto;
-      color: var(--accent);
-      background: #edf4ff;
+      width: 76px;
+      text-align: center;
+      color: #8a5a00;
+      background: #fff0cf;
       border-radius: 999px;
       padding: 2px 6px;
       font-size: 9px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-sizing: border-box;
     }
     .memo-side {
       flex: 0 0 48%;
@@ -492,7 +497,7 @@
           <div class="term-main">
             <div class="term">${escapeHtml(t.term)}</div>
             <div class="term-subrow">
-              ${t.alias ? `<div class="alias">${escapeHtml(t.alias)}</div>` : ""}
+              ${t.alias ? `<div class="alias">（${escapeHtml(t.alias)}）</div>` : ""}
               ${t.category ? `<span class="category-inline">${escapeHtml(t.category)}</span>` : ""}
             </div>
           </div>
@@ -553,7 +558,7 @@
     if (!t) return;
     $("detail").innerHTML = `
       <div class="detail-term">${escapeHtml(t.term)}</div>
-      ${t.alias ? `<div class="detail-alias">${escapeHtml(t.alias)}</div>` : ""}
+      ${t.alias ? `<div class="detail-alias">（${escapeHtml(t.alias)}）</div>` : ""}
       ${t.reading ? `<div class="detail-reading">${escapeHtml(t.reading)}</div>` : ""}
       ${t.category ? `<p><span class="detail-label">カテゴリ</span><br>${escapeHtml(t.category)}</p>` : ""}
       ${t.memo ? `<p><span class="detail-label">メモ</span><br>${String(t.memo).split(/\r?\n/).filter(Boolean).map(m => escapeHtml(m)).join("<br>")}</p>` : ""}
