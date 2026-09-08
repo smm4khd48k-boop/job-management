@@ -44,8 +44,8 @@
       gap: 12px;
       margin-bottom: 20px;
     }
-    h1 { margin: 0; font-size: 30px; letter-spacing: -.04em; }
-    .count { color: var(--sub); font-size: 14px; margin-top: 5px; }
+    h1 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
+    .count { color: var(--sub); font-size: 12px; margin-top: 5px; }
     .search-wrap { position: relative; margin-bottom: 14px; }
     .search {
       width: 100%;
@@ -82,8 +82,8 @@
       background: var(--card);
       color: var(--sub);
       border-radius: 8px;
-      padding: 6px 2px;
-      font-size: 13px;
+      padding: 5px 2px;
+      font-size: 11px;
       line-height: 1.2;
       cursor: pointer;
       text-align: center;
@@ -99,7 +99,7 @@
       background: var(--card);
       color: var(--sub);
       border-radius: 999px;
-      padding: 8px 13px;
+      padding: 6px 11px;
       cursor: pointer;
     }
     .chip.active { color: #fff; background: var(--text); border-color: var(--text); }
@@ -109,8 +109,8 @@
       align-items: center;
       margin: 20px 4px 10px;
     }
-    .section-title h2 { margin: 0; font-size: 18px; }
-    .section-title span { color: var(--sub); font-size: 13px; }
+    .section-title h2 { margin: 0; font-size: 16px; }
+    .section-title span { color: var(--sub); font-size: 11px; }
     .list { display: grid; gap: 10px; }
     .term-card {
       width: 100%;
@@ -118,16 +118,16 @@
       border: 0;
       background: var(--card);
       border-radius: 18px;
-      padding: 17px 18px;
+      padding: 12px 14px;
       box-shadow: var(--shadow);
       cursor: pointer;
     }
     .term-row { display: flex; align-items: center; gap: 12px; }
     .term-main { min-width: 0; flex: 1; }
-    .term { font-size: 16px; font-weight: 700; }
+    .term { font-size: 14px; font-weight: 700; }
     .memo-side {
-      flex: 0 0 38%;
-      max-width: 38%;
+      flex: 0 0 48%;
+      max-width: 48%;
       min-width: 0;
       display: flex;
       flex-direction: column;
@@ -136,6 +136,7 @@
     }
     .memo-item {
       max-width: 100%;
+      width: fit-content;
       color: var(--accent);
       background: #edf4ff;
       border-radius: 999px;
@@ -325,7 +326,7 @@
 (() => {
   const KEY = "workGlossaryTerms_v1";
   let terms = load();
-  let selectedCategory = "すべて";
+  let selectedCategories = [];
   let selectedKana = "すべて";
   let editingId = null;
   let viewingId = null;
@@ -350,11 +351,6 @@
     localStorage.setItem(KEY, JSON.stringify(terms));
   }
 
-  function toNumberedMemo(n) {
-    const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
-    return circled[n - 1] || `(${n})`;
-  }
-
   function escapeHtml(value = "") {
     return String(value).replace(/[&<>"']/g, c => ({
       "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
@@ -373,11 +369,18 @@
       .sort((a,b) => a.localeCompare(b, "ja"));
     const all = ["すべて", ...cats];
     $("filters").innerHTML = all.map(cat =>
-      `<button class="chip ${cat === selectedCategory ? "active" : ""}" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
+      `<button class="chip ${cat === "すべて" ? (selectedCategories.length === 0 ? "active" : "") : (selectedCategories.includes(cat) ? "active" : "")}" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
     ).join("");
     $("filters").querySelectorAll(".chip").forEach(btn => {
       btn.addEventListener("click", () => {
-        selectedCategory = btn.dataset.category;
+        const cat = btn.dataset.category;
+        if (cat === "すべて") {
+          selectedCategories = [];
+        } else if (selectedCategories.includes(cat)) {
+          selectedCategories = selectedCategories.filter(c => c !== cat);
+        } else {
+          selectedCategories = [...selectedCategories, cat];
+        }
         render();
       });
     });
@@ -421,7 +424,7 @@
   function getFiltered() {
     const q = $("search").value.trim().toLowerCase();
     return terms
-      .filter(t => selectedCategory === "すべて" || (t.category || "") === selectedCategory)
+      .filter(t => selectedCategories.length === 0 || selectedCategories.includes((t.category || "").trim()))
       .filter(t => selectedKana === "すべて" || getKanaGroup(t.reading || t.term) === selectedKana)
       .filter(t => !q || [t.term,t.reading,t.category,t.memo]
         .some(v => String(v || "").toLowerCase().includes(q)))
@@ -456,7 +459,7 @@
             <div class="term">${escapeHtml(t.term)}</div>
             ${t.reading ? `<div class="reading">${escapeHtml(t.reading)}</div>` : ""}
           </div>
-          ${t.memo ? `<div class="memo-side">${String(t.memo).split(/\r?\n/).filter(Boolean).map((m, i) => `<span class="memo-item">メモ${toNumberedMemo(i + 1)}：${escapeHtml(m)}</span>`).join("")}</div>` : ""}
+          ${t.memo ? `<div class="memo-side">${String(t.memo).split(/\r?\n/).filter(Boolean).map(m => `<span class="memo-item">${escapeHtml(m)}</span>`).join("")}</div>` : ""}
           ${!selectMode ? `<div class="arrow">›</div>` : ""}
         </div>
       </div>
@@ -514,7 +517,7 @@
       <div class="detail-term">${escapeHtml(t.term)}</div>
       ${t.reading ? `<div class="detail-reading">${escapeHtml(t.reading)}</div>` : ""}
       ${t.category ? `<p><span class="detail-label">カテゴリ</span><br>${escapeHtml(t.category)}</p>` : ""}
-      ${t.memo ? `<p><span class="detail-label">メモ</span><br>${String(t.memo).split(/\r?\n/).filter(Boolean).map((m, i) => `メモ${toNumberedMemo(i + 1)}：${escapeHtml(m)}`).join("<br>")}</p>` : ""}
+      ${t.memo ? `<p><span class="detail-label">メモ</span><br>${String(t.memo).split(/\r?\n/).filter(Boolean).map(m => escapeHtml(m)).join("<br>")}</p>` : ""}
       <div class="date">登録日：${formatDate(t.createdAt)}</div>
     `;
     $("detailModal").classList.add("show");
