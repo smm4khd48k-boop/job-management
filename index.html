@@ -124,16 +124,33 @@
     }
     .term-row { display: flex; align-items: center; gap: 12px; }
     .term-main { min-width: 0; flex: 1; }
-    .term { font-size: 19px; font-weight: 700; }
+    .term { font-size: 16px; font-weight: 700; }
     .memo-side {
-      flex: 0 0 auto; max-width: 42%; color: var(--accent); background: #edf4ff;
-      border-radius: 999px; padding: 5px 9px; font-size: 12px;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      flex: 0 0 38%;
+      max-width: 38%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    .memo-item {
+      max-width: 100%;
+      color: var(--accent);
+      background: #edf4ff;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .term-card.selecting { cursor: pointer; }
     .term-card.selected { outline: 2px solid var(--text); }
     .select-box { width: 22px; height: 22px; flex: 0 0 22px; accent-color: var(--text); }
-    .reading { color: var(--sub); font-size: 13px; margin-top: 4px; }
+    .term-card .reading { display: none; }
+    .reading { color: var(--sub); font-size: 11px; margin-top: 3px; }
     .category {
       display: inline-block;
       margin-top: 10px;
@@ -141,7 +158,7 @@
       background: #edf4ff;
       border-radius: 999px;
       padding: 5px 9px;
-      font-size: 12px;
+      font-size: 10px;
     }
     .arrow { color: #c7c7cc; font-size: 25px; align-self: center; }
     .list-actions { display: flex; align-items: center; gap: 6px; }
@@ -217,10 +234,10 @@
     .secondary { background: #f0f0f2; color: var(--text); }
     .danger { background: #fff0ef; color: var(--danger); }
     .detail p { white-space: pre-wrap; margin: 7px 0 18px; line-height: 1.7; }
-    .detail-label { color: var(--sub); font-size: 12px; font-weight: 700; }
+    .detail-label { color: var(--sub); font-size: 10px; font-weight: 700; }
     .detail-term { font-size: 29px; font-weight: 800; margin: 2px 0 4px; }
     .detail-reading { color: var(--sub); }
-    .date { color: var(--sub); font-size: 12px; }
+    .date { color: var(--sub); font-size: 10px; }
     @media (min-width: 700px) {
       .app { padding-top: 42px; }
       .modal { align-items: center; }
@@ -280,7 +297,7 @@
       </div>
       <div class="field">
         <label for="memo">メモ</label>
-        <textarea id="memo"></textarea>
+        <textarea id="memo" placeholder="1行につき1つのメモを入力"></textarea>
       </div>
       <div class="actions">
         <button class="primary" type="submit">保存する</button>
@@ -331,6 +348,11 @@
 
   function save() {
     localStorage.setItem(KEY, JSON.stringify(terms));
+  }
+
+  function toNumberedMemo(n) {
+    const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
+    return circled[n - 1] || `(${n})`;
   }
 
   function escapeHtml(value = "") {
@@ -434,7 +456,7 @@
             <div class="term">${escapeHtml(t.term)}</div>
             ${t.reading ? `<div class="reading">${escapeHtml(t.reading)}</div>` : ""}
           </div>
-          ${t.memo ? `<div class="memo-side">${escapeHtml(t.memo)}</div>` : ""}
+          ${t.memo ? `<div class="memo-side">${String(t.memo).split(/\r?\n/).filter(Boolean).map((m, i) => `<span class="memo-item">メモ${toNumberedMemo(i + 1)}：${escapeHtml(m)}</span>`).join("")}</div>` : ""}
           ${!selectMode ? `<div class="arrow">›</div>` : ""}
         </div>
       </div>
@@ -492,7 +514,7 @@
       <div class="detail-term">${escapeHtml(t.term)}</div>
       ${t.reading ? `<div class="detail-reading">${escapeHtml(t.reading)}</div>` : ""}
       ${t.category ? `<p><span class="detail-label">カテゴリ</span><br>${escapeHtml(t.category)}</p>` : ""}
-      ${t.memo ? `<p><span class="detail-label">メモ</span><br>${escapeHtml(t.memo)}</p>` : ""}
+      ${t.memo ? `<p><span class="detail-label">メモ</span><br>${String(t.memo).split(/\r?\n/).filter(Boolean).map((m, i) => `メモ${toNumberedMemo(i + 1)}：${escapeHtml(m)}`).join("<br>")}</p>` : ""}
       <div class="date">登録日：${formatDate(t.createdAt)}</div>
     `;
     $("detailModal").classList.add("show");
