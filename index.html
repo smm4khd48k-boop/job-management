@@ -1,713 +1,1090 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f5f6f8">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="仕事用語集">
-  <link rel="manifest" href="manifest.json">
-  <title>仕事用語集</title>
-  <style>
-    :root {
-      --bg: #f5f6f8;
-      --card: #ffffff;
-      --text: #1d1d1f;
-      --sub: #6e6e73;
-      --line: #e5e5ea;
-      --accent: #3b82f6;
-      --danger: #d92d20;
-      --shadow: 0 8px 24px rgba(0,0,0,.06);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Sans",
-                   "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-    button, input, textarea, select { font: inherit; }
-    button { -webkit-tap-highlight-color: transparent; }
-    .app {
-      width: min(760px, 100%);
-      margin: 0 auto;
-      min-height: 100vh;
-      padding: 28px 18px calc(100px + env(safe-area-inset-bottom));
-    }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    h1 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
-    .count { color: var(--sub); font-size: 12px; margin-top: 5px; }
-    .search-wrap { position: relative; margin-bottom: 14px; }
-    .search {
-      width: 100%;
-      border: 0;
-      outline: 0;
-      background: var(--card);
-      border-radius: 16px;
-      padding: 15px 16px 15px 46px;
-      box-shadow: var(--shadow);
-      font-size: 16px;
-    }
-    .search-icon {
-      position: absolute; left: 16px; top: 50%;
-      transform: translateY(-50%);
-      color: #8e8e93; pointer-events: none;
-    }
-    .filters {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 2px 0 8px;
-      scrollbar-width: none;
-    }
-    .filters::-webkit-scrollbar { display: none; }
-    .kana-filters {
-      display: grid;
-      grid-template-columns: repeat(11, minmax(0, 1fr));
-      gap: 4px;
-      margin: 2px 0 8px;
-      padding: 0;
-    }
-    .kana-chip {
-      border: 1px solid var(--line);
-      background: var(--card);
-      color: var(--sub);
-      border-radius: 8px;
-      padding: 5px 2px;
-      font-size: 11px;
-      line-height: 1.2;
-      cursor: pointer;
-      text-align: center;
-    }
-    .kana-chip.active {
-      color: #fff;
-      background: var(--text);
-      border-color: var(--text);
-    }
-    .chip {
-      flex: 0 0 auto;
-      border: 1px solid var(--line);
-      background: var(--card);
-      color: var(--sub);
-      border-radius: 999px;
-      padding: 6px 11px;
-      cursor: pointer;
-    }
-    .chip.active { color: #fff; background: var(--text); border-color: var(--text); }
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 20px 4px 10px;
-    }
-    .section-title h2 { margin: 0; font-size: 16px; }
-    .section-title span { color: var(--sub); font-size: 11px; }
-    .list { display: grid; gap: 10px; }
-    .term-card {
-      width: 100%;
-      text-align: left;
-      border: 0;
-      background: var(--card);
-      border-radius: 18px;
-      padding: 10px 12px;
-      box-shadow: var(--shadow);
-      cursor: pointer;
-    }
-    .term-row {
-      display: grid;
-      grid-template-columns: minmax(0, 40%) 70px minmax(0, 1fr) 18px;
-      align-items: center;
-      gap: 6px;
-    }
-    .term-card.selecting .term-row {
-      grid-template-columns: 28px minmax(0, 40%) 70px minmax(0, 1fr) 18px;
-    }
-    .term-main { min-width: 0; }
-    .term { 
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .alias {
-      min-width: 0;
-      margin-top: 2px;
-      color: var(--sub);
-      font-size: 9px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .category-side {
-      grid-column: 2;
-      width: 70px;
-      min-width: 70px;
-      display: flex;
-      justify-content: flex-start;
-      align-items: flex-end;
-      padding-bottom: 1px;
-    }
-    .term-card.selecting .category-side { grid-column: 3; }
-    .term-card.selecting .memo-side { grid-column: 4; }
-    .category-inline {
-      width: 70px;
-      text-align: center;
-      color: var(--cat-fg);
-      background: var(--cat-bg);
-      border: 1px solid var(--cat-fg);
-      border-radius: 999px;
-      padding: 2px 6px;
-      font-size: 9px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      box-sizing: border-box;
-    }
-    .memo-side {
-      grid-column: 3;
-      width: 100%;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
-    }
-    .memo-item {
-      max-width: 100%;
-      width: fit-content;
-      color: var(--accent);
-      background: #edf4ff;
-      border-radius: 999px;
-      padding: 3px 7px;
-      font-size: 9px;
-      box-sizing: border-box;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .term-card.selecting { cursor: pointer; }
-    .term-card.selected { outline: 2px solid var(--text); }
-    .select-box {
-      grid-column: 1;
-      width: 22px;
-      height: 22px;
-      accent-color: var(--text);
-      justify-self: center;
-    }
-    .term-card.selecting .term-main { grid-column: 2; }
-    .term-card .reading { display: none; }
-    .reading { color: var(--sub); font-size: 11px; margin-top: 3px; }
-    .category {
-      display: inline-block;
-      margin-top: 10px;
-      color: var(--accent);
-      background: #edf4ff;
-      border-radius: 999px;
-      padding: 5px 9px;
-      font-size: 10px;
-    }
-    .arrow { grid-column: 4; color: #c7c7cc; font-size: 25px; align-self: center; }
-    .term-card.selecting .arrow { grid-column: 5; }
-    .list-actions { display: flex; align-items: center; gap: 6px; }
-    .select-btn, .bulk-delete-btn, .done-btn { border: 0; border-radius: 999px; padding: 6px 9px; font-size: 11px; cursor: pointer; }
-    .select-btn, .done-btn { background: #f0f0f2; color: var(--text); }
-    .bulk-delete-btn { background: #fff0ef; color: var(--danger); }
-    .bulk-delete-btn:disabled { opacity: .45; cursor: default; }
-    .empty {
-      background: var(--card);
-      border-radius: 18px;
-      padding: 36px 20px;
-      text-align: center;
-      color: var(--sub);
-      box-shadow: var(--shadow);
-    }
-    .fab {
-      position: fixed;
-      right: 20px;
-      bottom: calc(20px + env(safe-area-inset-bottom));
-      width: 58px; height: 58px;
-      border: 0; border-radius: 50%;
-      background: var(--text); color: #fff;
-      font-size: 30px; line-height: 1;
-      box-shadow: 0 10px 28px rgba(0,0,0,.18);
-      cursor: pointer;
-      z-index: 10;
-    }
-    .modal {
-      position: fixed; inset: 0;
-      display: none;
-      background: rgba(0,0,0,.42);
-      z-index: 20;
-      padding: 18px;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    .modal.show { display: flex; }
-    .sheet {
-      width: min(760px, 100%);
-      max-height: 92vh;
-      overflow: auto;
-      background: var(--card);
-      border-radius: 24px 24px 12px 12px;
-      padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
-    }
-    .sheet-head {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 16px;
-    }
-    .sheet-head h2 { margin: 0; font-size: 22px; }
-    .close {
-      border: 0; background: #f0f0f2; width: 38px; height: 38px;
-      border-radius: 50%; font-size: 22px; cursor: pointer;
-    }
-    .field { margin: 13px 0; }
-    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
-    input, textarea {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      outline: none;
-      padding: 12px 13px;
-      background: #fafafa;
-    }
-    input:focus, textarea:focus { border-color: #9bbcf7; background: #fff; }
-    textarea { min-height: 110px; resize: vertical; }
-    .actions { display: grid; gap: 9px; margin-top: 18px; }
-    .primary, .secondary, .danger {
-      border: 0; border-radius: 13px; padding: 13px;
-      cursor: pointer; font-weight: 700;
-    }
-    .primary { background: var(--text); color: #fff; }
-    .secondary { background: #f0f0f2; color: var(--text); }
-    .danger { background: #fff0ef; color: var(--danger); }
-    .detail p { white-space: pre-wrap; margin: 7px 0 18px; line-height: 1.7; }
-    .detail-label { color: var(--sub); font-size: 10px; font-weight: 700; }
-    .detail-term { font-size: 29px; font-weight: 800; margin: 2px 0 4px; }
-    .detail-alias { color: var(--sub); font-size: 13px; margin-bottom: 3px; }
-    .detail-reading { color: var(--sub); }
-    .date { color: var(--sub); font-size: 10px; }
-    @media (min-width: 700px) {
-      .app { padding-top: 42px; }
-      .modal { align-items: center; }
-      .sheet { border-radius: 24px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f6f8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="仕事管理">
+<link rel="manifest" href="manifest.json">
+<title>仕事管理</title>
+
+<style>
+:root{
+  --bg:#f5f6f8;
+  --card:#fff;
+  --text:#1d1d1f;
+  --sub:#6e6e73;
+  --line:#e5e5ea;
+  --danger:#c62828;
+  --accent:#2563eb
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif
+}
+.app{
+  max-width:760px;
+  margin:auto;
+  min-height:100vh;
+  padding:22px 16px 100px
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px
+}
+h1{font-size:24px;margin:0}
+.count{
+  font-size:11px;
+  color:var(--sub);
+  margin-top:3px
+}
+.top-actions{
+  display:flex;
+  gap:8px
+}
+.btn{
+  border:0;
+  border-radius:12px;
+  padding:10px 13px;
+  background:#fff;
+  box-shadow:0 4px 16px #0000000b
+}
+.primary{
+  background:var(--text);
+  color:#fff
+}
+.search{
+  width:100%;
+  border:0;
+  border-radius:14px;
+  padding:13px 14px;
+  background:#fff;
+  box-shadow:0 4px 16px #0000000b;
+  margin-bottom:12px
+}
+.tabs{
+  display:flex;
+  background:#e9e9ed;
+  border-radius:13px;
+  padding:3px;
+  margin-bottom:12px
+}
+.tab{
+  flex:1;
+  border:0;
+  border-radius:10px;
+  padding:10px;
+  background:transparent
+}
+.tab.active{
+  background:#fff;
+  font-weight:700;
+  box-shadow:0 2px 8px #0000000b
+}
+.list{
+  display:grid;
+  gap:8px
+}
+.row{
+  background:#fff;
+  border:0;
+  border-bottom:1px solid var(--line);
+  width:100%;
+  text-align:left;
+  padding:13px 8px;
+  cursor:pointer
+}
+.row-name{
+  font-weight:700;
+  font-size:15px
+}
+.row-sub{
+  font-size:11px;
+  color:var(--sub);
+  margin-top:4px
+}
+.row-meta{
+  font-size:11px;
+  color:var(--sub);
+  margin-top:3px
+}
+.kana{
+  font-size:11px;
+  font-weight:700;
+  color:var(--sub);
+  padding:10px 4px 3px
+}
+.empty{
+  background:#fff;
+  border-radius:14px;
+  padding:32px;
+  text-align:center;
+  color:var(--sub);
+  font-size:13px
+}
+.modal{
+  position:fixed;
+  inset:0;
+  background:#0006;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:12px;
+  z-index:20
+}
+.modal.show{display:flex}
+.sheet{
+  width:min(760px,100%);
+  max-height:94vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:22px 22px 12px 12px;
+  padding:20px 16px calc(20px + env(safe-area-inset-bottom))
+}
+.sheet-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px
+}
+.sheet-head h2{
+  font-size:20px;
+  margin:0
+}
+.close{
+  border:0;
+  background:#f0f0f2;
+  border-radius:50%;
+  width:36px;
+  height:36px
+}
+.field{margin:12px 0}
+label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:6px
+}
+input,textarea,select{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:11px 12px;
+  background:#fafafa
+}
+textarea{
+  min-height:100px;
+  resize:vertical
+}
+.multi{
+  display:grid;
+  gap:7px;
+  grid-template-columns:1fr 1fr
+}
+.check{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px;
+  font-size:12px
+}
+.check input{
+  width:auto;
+  margin-right:6px
+}
+.actions{
+  display:grid;
+  gap:8px;
+  margin-top:18px
+}
+.actions button{
+  border:0;
+  border-radius:12px;
+  padding:12px
+}
+.detail-label{
+  font-size:10px;
+  color:var(--sub);
+  font-weight:700;
+  margin-top:14px
+}
+.detail-value{
+  margin-top:4px;
+  white-space:pre-wrap;
+  line-height:1.6
+}
+.history{
+  padding:10px 0;
+  border-bottom:1px solid var(--line)
+}
+.danger{
+  color:var(--danger);
+  background:#fff0f0
+}
+.bottom{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#fff;
+  border-top:1px solid var(--line);
+  display:flex;
+  padding:7px 12px calc(7px + env(safe-area-inset-bottom));
+  z-index:10
+}
+.bottom button{
+  flex:1;
+  border:0;
+  background:transparent;
+  padding:7px;
+  font-size:12px
+}
+.bottom .active{font-weight:700}
+
+@media(min-width:700px){
+  .modal{align-items:center}
+  .sheet{border-radius:22px}
+}
+</style>
 </head>
+
 <body>
+
 <div class="app">
-  <header>
-    <div>
-      <h1>仕事用語集</h1>
-      <div class="count" id="count"></div>
-    </div>
-  </header>
 
-  <div class="search-wrap">
-    <span class="search-icon">⌕</span>
-    <input id="search" class="search" type="search" placeholder="用語を検索…" autocomplete="off">
+<header>
+  <div>
+    <h1 id="title">施設</h1>
+    <div class="count" id="count"></div>
   </div>
 
-  <div id="filters" class="filters"></div>
-  <div id="kanaFilters" class="kana-filters"></div>
-
-  <div class="section-title">
-    <h2>用語一覧</h2>
-    <div class="list-actions">
-      <span id="resultCount"></span>
-      <button class="select-btn" id="selectModeBtn" type="button">選択</button>
-      <button class="bulk-delete-btn" id="bulkDeleteBtn" type="button" disabled>選択削除</button>
-      <button class="done-btn" id="doneSelectBtn" type="button" style="display:none">完了</button>
-    </div>
+  <div class="top-actions">
+    <button class="btn primary" id="addBtn">＋登録</button>
+    <button class="btn" id="searchBtn">検索</button>
   </div>
-  <div id="list" class="list"></div>
+</header>
+
+<div id="searchArea" style="display:none">
+  <input class="search" id="searchInput" placeholder="検索…">
 </div>
 
-<button class="fab" id="addBtn" aria-label="用語を追加">＋</button>
+<div id="list" class="list"></div>
+
+</div>
+
+<nav class="bottom">
+  <button id="facilityTab" class="active">施設</button>
+  <button id="staffTab">スタッフ</button>
+</nav>
 
 <div class="modal" id="formModal">
   <div class="sheet">
+
     <div class="sheet-head">
-      <h2 id="formTitle">用語を追加</h2>
+      <h2 id="formTitle">施設登録</h2>
       <button class="close" id="formClose">×</button>
     </div>
-    <form id="termForm">
-      <div class="field">
-        <label for="term">用語</label>
-        <input id="term" required>
-      </div>
-      <div class="field">
-        <label for="reading">読み方</label>
-        <input id="reading">
-      </div>
-      <div class="field">
-        <label for="alias">別名</label>
-        <input id="alias" placeholder="別名・略称など">
-      </div>
-      <div class="field">
-        <label for="category">カテゴリ</label>
-        <input id="category" placeholder="自由に入力">
-      </div>
-      <div class="field">
-        <label for="memo">メモ</label>
-        <textarea id="memo" placeholder="1行につき1つのメモを入力"></textarea>
-      </div>
-      <div class="actions">
-        <button class="primary" type="submit">保存する</button>
-        <button class="secondary" type="button" id="formCancel">キャンセル</button>
-      </div>
-    </form>
+
+    <form id="form"></form>
+
   </div>
 </div>
 
 <div class="modal" id="detailModal">
   <div class="sheet">
+
     <div class="sheet-head">
-      <h2>用語の詳細</h2>
+      <h2 id="detailTitle">詳細</h2>
       <button class="close" id="detailClose">×</button>
     </div>
-    <div class="detail" id="detail"></div>
-    <div class="actions">
-      <button class="primary" id="editBtn">編集する</button>
-      <button class="danger" id="deleteBtn">削除する</button>
-    </div>
+
+    <div id="detail"></div>
+
   </div>
 </div>
 
 <script>
-(() => {
-  const KEY = "workGlossaryTerms_v1";
-  let terms = load();
-  let selectedCategories = [];
-  let selectedKana = "すべて";
-  let editingId = null;
-  let viewingId = null;
-  let selectMode = false;
-  let selectedIds = new Set();
 
-  const $ = id => document.getElementById(id);
+const FACILITY_TYPES=[
+  '病院',
+  '特養',
+  '老健',
+  'サ高住',
+  '住宅型有料老人ホーム',
+  '介護付有料老人ホーム',
+  'グループホーム',
+  'デイサービス',
+  'デイケア',
+  '小規模多機能',
+  '障がい者入所施設',
+  '障がい者グループホーム',
+  '就労継続支援B型',
+  '放課後等デイサービス',
+  'その他'
+];
 
-  function load() {
-    try {
-      const raw = localStorage.getItem(KEY);
-      const data = raw ? JSON.parse(raw) : [];
-      return Array.isArray(data)
-        ? data.map(({ understanding, ...term }) => term)
-        : [];
-    } catch {
-      return [];
-    }
-  }
+const QUALS=[
+  '無資格',
+  '認知症介護基礎研修',
+  '初任者研修',
+  '実務者研修',
+  '介護福祉士',
+  '看護師',
+  '准看護師',
+  'PT（理学療法士）',
+  'OT（作業療法士）',
+  'ST（言語聴覚士）',
+  'その他'
+];
 
-  function save() {
-    localStorage.setItem(KEY, JSON.stringify(terms));
-  }
+let facilities=JSON.parse(localStorage.getItem('facilities')||'[]');
+let staff=JSON.parse(localStorage.getItem('staff')||'[]');
 
-  function categoryColors(category) {
-    const palette = [
-      ["#E6F4EA", "#185C37"],
-      ["#FFF4CC", "#6B5200"],
-      ["#E8EAF6", "#3949AB"],
-      ["#FCE8E6", "#9B2C2C"],
-      ["#E6F0F8", "#24506F"],
-      ["#F3E8F7", "#6A3D73"],
-      ["#F1ECE4", "#604A2E"],
-      ["#E8F1EE", "#315C50"]
-    ];
-    const key = String(category || "").trim();
-    let hash = 0;
-    for (let i = 0; i < key.length; i++) {
-      hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-    }
-    const [bg, fg] = palette[hash % palette.length];
-    return `--cat-bg:${bg};--cat-fg:${fg};`;
-  }
+let mode='facility';
+let editing=null;
 
-  function escapeHtml(value = "") {
-    return String(value).replace(/[&<>"']/g, c => ({
-      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
-    }[c]));
-  }
+const $=id=>document.getElementById(id);
 
-  function formatDate(iso) {
-    if (!iso) return "";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return "";
-    return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`;
-  }
+function save(){
+  localStorage.setItem('facilities',JSON.stringify(facilities));
+  localStorage.setItem('staff',JSON.stringify(staff));
+}
 
-  function renderFilters() {
-    const cats = [...new Set(terms.map(t => (t.category || "").trim()).filter(Boolean))]
-      .sort((a,b) => a.localeCompare(b, "ja"));
-    const all = ["すべて", ...cats];
-    $("filters").innerHTML = all.map(cat =>
-      `<button class="chip ${cat === "すべて" ? (selectedCategories.length === 0 ? "active" : "") : (selectedCategories.includes(cat) ? "active" : "")}" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`
-    ).join("");
-    $("filters").querySelectorAll(".chip").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const cat = btn.dataset.category;
-        if (cat === "すべて") {
-          selectedCategories = [];
-        } else if (selectedCategories.includes(cat)) {
-          selectedCategories = selectedCategories.filter(c => c !== cat);
-        } else {
-          selectedCategories = [...selectedCategories, cat];
-        }
-        render();
-      });
-    });
-  }
+function esc(s){
+  return String(s??'').replace(/[&<>"']/g,c=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c]));
+}
 
-  function normalizeKana(value = "") {
-    return String(value).trim().replace(/[ァ-ヶ]/g, ch =>
-      String.fromCharCode(ch.charCodeAt(0) - 0x60)
+function render(){
+
+  $('title').textContent=mode==='facility'?'施設':'スタッフ';
+
+  $('count').textContent=
+    (mode==='facility'?facilities:staff).length+'件';
+
+  $('facilityTab').classList.toggle(
+    'active',
+    mode==='facility'
+  );
+
+  $('staffTab').classList.toggle(
+    'active',
+    mode==='staff'
+  );
+
+  let arr=mode==='facility'?facilities:staff;
+
+  let q=$('searchInput').value.trim();
+
+  if(q){
+
+    arr=arr.filter(x=>
+      Object.values(x).join(' ').includes(q)
     );
+
   }
 
-  function getKanaGroup(reading = "") {
-    const ch = normalizeKana(reading).charAt(0);
-    if ("あいうえお".includes(ch)) return "あ";
-    if ("かきくけこがぎぐげござじずぜぞ".includes(ch)) return "か";
-    if ("さしすせそざじずぜぞ".includes(ch)) return "さ";
-    if ("たちつてとだぢづでど".includes(ch)) return "た";
-    if ("なにぬねの".includes(ch)) return "な";
-    if ("はひふへほばびぶべぼぱぴぷぺぽ".includes(ch)) return "は";
-    if ("まみむめも".includes(ch)) return "ま";
-    if ("やゆよ".includes(ch)) return "や";
-    if ("らりるれろ".includes(ch)) return "ら";
-    if ("わをん".includes(ch)) return "わ";
-    return "";
-  }
+  arr=[...arr].sort((a,b)=>
+    String(a.name||'').localeCompare(
+      String(b.name||''),
+      'ja'
+    )
+  );
 
-  function renderKanaFilters() {
-    const kanaGroups = ["すべて","あ","か","さ","た","な","は","ま","や","ら","わ"];
-    $("kanaFilters").innerHTML = kanaGroups.map(kana =>
-      `<button class="kana-chip ${kana === selectedKana ? "active" : ""}" data-kana="${kana}">${kana}</button>`
-    ).join("");
+  let html='';
+  let last='';
 
-    $("kanaFilters").querySelectorAll(".kana-chip").forEach(btn => {
-      btn.addEventListener("click", () => {
-        selectedKana = btn.dataset.kana;
-        render();
-      });
-    });
-  }
+  arr.forEach(x=>{
 
-  function getFiltered() {
-    const q = $("search").value.trim().toLowerCase();
-    return terms
-      .filter(t => selectedCategories.length === 0 || selectedCategories.includes((t.category || "").trim()))
-      .filter(t => selectedKana === "すべて" || getKanaGroup(t.reading || t.term) === selectedKana)
-      .filter(t => !q || [t.term,t.reading,t.alias,t.category,t.memo]
-        .some(v => String(v || "").toLowerCase().includes(q)))
-      .sort((a,b) => {
-        // 絞り込みなしの「すべて」は登録順（新しいものを上）、
-        // かな絞り込み時はこれまで通り読み方順。
-        if (selectedCategories.length === 0 && selectedKana === "すべて") {
-          return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
-        }
-        const ar = String(a.reading || a.term || "");
-        const br = String(b.reading || b.term || "");
-        return ar.localeCompare(br, "ja", { sensitivity: "base" });
-      });
-  }
+    let first=
+      (x.name||'').trim().charAt(0)||'その他';
 
-  function render() {
-    renderFilters();
-    renderKanaFilters();
-    const filtered = getFiltered();
-    $("count").textContent = `${terms.length}件登録`;
-    $("resultCount").textContent = `${filtered.length}件`;
-    $("selectModeBtn").style.display = selectMode ? "none" : "";
-    $("doneSelectBtn").style.display = selectMode ? "" : "none";
-    $("bulkDeleteBtn").disabled = selectedIds.size === 0;
-    $("bulkDeleteBtn").textContent = selectedIds.size ? `選択削除（${selectedIds.size}）` : "選択削除";
+    if(first!==last){
 
-    if (!filtered.length) {
-      $("list").innerHTML = `<div class="empty">${terms.length ? "条件に一致する用語がありません。" : "まだ用語が登録されていません。<br>右下の「＋」から追加できます。"}</div>`;
-      return;
+      html+=`
+        <div class="kana">
+          ${esc(first)}
+        </div>
+      `;
+
+      last=first;
+
     }
 
-    $("list").innerHTML = filtered.map(t => `
-      <div class="term-card ${selectMode ? "selecting" : ""} ${selectedIds.has(t.id) ? "selected" : ""}" data-id="${t.id}" role="button" tabindex="0">
-        <div class="term-row">
-          ${selectMode ? `<input class="select-box" type="checkbox" ${selectedIds.has(t.id) ? "checked" : ""} aria-label="${escapeHtml(t.term)}を選択">` : ""}
-          <div class="term-main">
-            <div class="term">${escapeHtml(t.term)}</div>
-            ${t.alias ? `<div class="alias">（${escapeHtml(t.alias)}）</div>` : ""}
-          </div>
-          <div class="category-side">
-            ${t.category ? `<span class="category-inline" style="${categoryColors(t.category)}">${escapeHtml(t.category)}</span>` : ""}
-          </div>
-          <div class="memo-side">
-            ${t.memo ? String(t.memo).split(/\r?\n/).filter(Boolean).map(m => `<span class="memo-item">${escapeHtml(m)}</span>`).join("") : ""}
-          </div>
-          ${!selectMode ? `<div class="arrow">›</div>` : ""}
-        </div>
-      </div>
-    `).join("");
+    if(mode==='facility'){
 
-    $("list").querySelectorAll(".term-card").forEach(card => {
-      const toggle = () => {
-        const id = card.dataset.id;
-        if (!selectMode) { openDetail(id); return; }
-        if (selectedIds.has(id)) selectedIds.delete(id);
-        else selectedIds.add(id);
-        render();
+      let ss=staff.filter(
+        s=>s.facilityId===x.id
+      );
+
+      html+=`
+        <button class="row" data-id="${x.id}">
+
+          <div class="row-name">
+            ${esc(x.name)}
+          </div>
+
+          <div class="row-sub">
+            ${esc(x.type||'種別未登録')}
+            　
+            担当者：${esc(x.contact||'未登録')}
+          </div>
+
+          <div class="row-meta">
+            派遣スタッフ：
+            ${
+              ss.length
+              ?ss.map(s=>esc(s.name)).join('、')
+              :'無'
+            }
+          </div>
+
+        </button>
+      `;
+
+    }else{
+
+      let f=facilities.find(
+        f=>f.id===x.facilityId
+      );
+
+      html+=`
+        <button class="row" data-id="${x.id}">
+
+          <div class="row-name">
+            ${esc(x.name)}
+          </div>
+
+          <div class="row-sub">
+            ${esc(x.age)}歳　
+            ${esc(x.gender)}
+          </div>
+
+          <div class="row-meta">
+            派遣先：
+            ${esc(f?.name||'施設無')}
+          </div>
+
+        </button>
+      `;
+
+    }
+
+  });
+
+  $('list').innerHTML=
+    html ||
+    '<div class="empty">登録されている情報はありません</div>';
+
+  document.querySelectorAll('.row')
+    .forEach(b=>{
+      b.onclick=()=>{
+        openDetail(b.dataset.id);
       };
-      card.addEventListener("click", e => {
-        if (e.target.classList.contains("select-box")) return;
-        toggle();
-      });
-      card.addEventListener("keydown", e => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
-      });
     });
+}
 
-    $("list").querySelectorAll(".select-box").forEach(box => {
-      box.addEventListener("change", e => {
-        const id = e.target.closest(".term-card").dataset.id;
-        if (e.target.checked) selectedIds.add(id);
-        else selectedIds.delete(id);
-        render();
-      });
-    });
-  }
+function input(
+  id,
+  label,
+  val='',
+  type='text',
+  required=false
+){
 
-  function openForm(id = null) {
-    editingId = id;
-    $("formTitle").textContent = id ? "用語を編集" : "用語を追加";
-    const t = id ? terms.find(x => x.id === id) : null;
-    $("term").value = t?.term || "";
-    $("reading").value = t?.reading || "";
-    $("alias").value = t?.alias || "";
-    $("category").value = t?.category || "";
-    $("memo").value = t?.memo || "";
-    $("formModal").classList.add("show");
-    setTimeout(() => $("term").focus(), 50);
-  }
+  return `
+    <div class="field">
 
-  function closeForm() {
-    $("formModal").classList.remove("show");
-    editingId = null;
-  }
+      <label for="${id}">
+        ${label}
+      </label>
 
-  function openDetail(id) {
-    viewingId = id;
-    const t = terms.find(x => x.id === id);
-    if (!t) return;
-    $("detail").innerHTML = `
-      <div class="detail-term">${escapeHtml(t.term)}</div>
-      ${t.alias ? `<div class="detail-alias">（${escapeHtml(t.alias)}）</div>` : ""}
-      ${t.reading ? `<div class="detail-reading">${escapeHtml(t.reading)}</div>` : ""}
-      ${t.category ? `<p><span class="detail-label">カテゴリ</span><br>${escapeHtml(t.category)}</p>` : ""}
-      ${t.memo ? `<p><span class="detail-label">メモ</span><br>${String(t.memo).split(/\r?\n/).filter(Boolean).map(m => escapeHtml(m)).join("<br>")}</p>` : ""}
-      <div class="date">登録日：${formatDate(t.createdAt)}</div>
+      <input
+        id="${id}"
+        type="${type==='number'?'number':'text'}"
+        value="${esc(val)}"
+        ${required?'required':''}
+      >
+
+    </div>
+  `;
+}
+
+function textarea(
+  id,
+  label,
+  val=''
+){
+
+  return `
+    <div class="field">
+
+      <label for="${id}">
+        ${label}
+      </label>
+
+      <textarea id="${id}">${esc(val)}</textarea>
+
+    </div>
+  `;
+}
+
+function select(
+  id,
+  label,
+  opts,
+  val=''
+){
+
+  return `
+    <div class="field">
+
+      <label for="${id}">
+        ${label}
+      </label>
+
+      <select id="${id}" required>
+
+        <option value="">
+          選択してください
+        </option>
+
+        ${
+          opts.map(o=>`
+            <option
+              ${o===val?'selected':''}
+            >
+              ${esc(o)}
+            </option>
+          `).join('')
+        }
+
+      </select>
+
+    </div>
+  `;
+}
+
+function openForm(id=null){
+
+  editing=id;
+
+  $('formTitle').textContent=
+    (mode==='facility'?'施設':'スタッフ')+
+    (id?'編集':'登録');
+
+  let x=
+    (mode==='facility'
+      ?facilities
+      :staff
+    ).find(a=>a.id===id)||{};
+
+  let f=$('form');
+
+  if(mode==='facility'){
+
+    f.innerHTML=`
+
+      ${input(
+        'name',
+        '施設名',
+        x.name,
+        'text',
+        true
+      )}
+
+      ${select(
+        'type',
+        '施設種別',
+        FACILITY_TYPES,
+        x.type
+      )}
+
+      ${input(
+        'address',
+        '住所（〇〇町まで）',
+        x.address
+      )}
+
+      ${input(
+        'contact',
+        '担当者',
+        x.contact
+      )}
+
+      ${input(
+        'role',
+        '担当者の役職',
+        x.role
+      )}
+
+      <div class="field">
+
+        <label>
+          担当スタッフ
+        </label>
+
+        <select id="facilityStaff">
+
+          <option value="">
+            選択なし
+          </option>
+
+          ${
+            staff.map(s=>`
+              <option
+                value="${s.id}"
+                ${staff.some(
+                  st=>st.id===s.id &&
+                  st.facilityId===x.id
+                )?'selected':''}
+              >
+                ${esc(s.name)}
+              </option>
+            `).join('')
+          }
+
+        </select>
+
+      </div>
+
+      ${textarea(
+        'memo',
+        'メモ',
+        x.memo
+      )}
+
     `;
-    $("detailModal").classList.add("show");
+
+  }else{
+
+    f.innerHTML=`
+
+      ${input(
+        'name',
+        '氏名',
+        x.name,
+        'text',
+        true
+      )}
+
+      ${input(
+        'age',
+        '年齢',
+        x.age,
+        'number',
+        true
+      )}
+
+      <div class="field">
+
+        <label>
+          性別
+        </label>
+
+        <select id="gender" required>
+
+          <option value="">
+            選択してください
+          </option>
+
+          <option
+            ${x.gender==='男性'?'selected':''}
+          >
+            男性
+          </option>
+
+          <option
+            ${x.gender==='女性'?'selected':''}
+          >
+            女性
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          保有資格・研修（複数選択可）
+        </label>
+
+        <div class="multi">
+
+          ${
+            QUALS.map(q=>`
+              <label class="check">
+
+                <input
+                  type="checkbox"
+                  name="quals"
+                  value="${esc(q)}"
+                  ${
+                    (x.quals||[]).includes(q)
+                    ?'checked'
+                    :''
+                  }
+                >
+
+                ${esc(q)}
+
+              </label>
+            `).join('')
+          }
+
+        </div>
+
+      </div>
+
+      ${textarea(
+        'experience',
+        '経験',
+        x.experience
+      )}
+
+      <div class="field">
+
+        <label>
+          現在の派遣先
+        </label>
+
+        <select id="facilityId">
+
+          <option value="">
+            施設無
+          </option>
+
+          ${
+            facilities.map(a=>`
+              <option
+                value="${a.id}"
+                ${
+                  x.facilityId===a.id
+                  ?'selected'
+                  :''
+                }
+              >
+                ${esc(a.name)}
+              </option>
+            `).join('')
+          }
+
+        </select>
+
+      </div>
+
+      ${textarea(
+        'memo',
+        'メモ',
+        x.memo
+      )}
+
+      ${
+        id
+        ?`
+          <div class="field">
+
+            <label>
+              派遣履歴
+            </label>
+
+            ${
+              (x.history||[]).map(h=>`
+                <div class="history">
+
+                  ${esc(h.facilityName)}
+
+                  <br>
+
+                  <small>
+                    ${esc(h.start||'開始日未入力')}
+                    ～
+                    ${esc(h.end||'終了日未入力')}
+                  </small>
+
+                </div>
+              `).join('')
+              ||
+              '<div class="row-sub">履歴なし</div>'
+            }
+
+          </div>
+        `
+        :''
+      }
+
+    `;
+
   }
 
-  function closeDetail() {
-    $("detailModal").classList.remove("show");
-    viewingId = null;
-  }
+  f.onsubmit=e=>{
 
-  $("search").addEventListener("input", render);
-  $("addBtn").addEventListener("click", () => openForm());
-  $("formClose").addEventListener("click", closeForm);
-  $("formCancel").addEventListener("click", closeForm);
-  $("detailClose").addEventListener("click", closeDetail);
-
-  $("termForm").addEventListener("submit", e => {
     e.preventDefault();
-    const term = $("term").value.trim();
-    if (!term) return;
 
-    const payload = {
-      term,
-      reading: $("reading").value.trim(),
-      alias: $("alias").value.trim(),
-      category: $("category").value.trim(),
-      memo: $("memo").value.trim()
+    let data={
+      ...x,
+      id:id||crypto.randomUUID()
     };
 
-    if (editingId) {
-      const index = terms.findIndex(t => t.id === editingId);
-      if (index >= 0) terms[index] = { ...terms[index], ...payload };
-    } else {
-      terms.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        ...payload,
-        createdAt: new Date().toISOString()
-      });
+    if(mode==='facility'){
+
+      data.name=$('name').value;
+      data.type=$('type').value;
+      data.address=$('address').value;
+      data.contact=$('contact').value;
+      data.role=$('role').value;
+      data.memo=$('memo').value;
+
+      let sid=$('facilityStaff').value;
+
+      if(sid){
+
+        staff.forEach(s=>{
+
+          if(s.id===sid){
+            s.facilityId=data.id;
+          }
+
+        });
+
+      }
+
+    }else{
+
+      data.name=$('name').value;
+      data.age=$('age').value;
+      data.gender=$('gender').value;
+
+      data.quals=[
+        ...document.querySelectorAll(
+          '[name=quals]:checked'
+        )
+      ].map(e=>e.value);
+
+      data.experience=$('experience').value;
+      data.facilityId=$('facilityId').value;
+      data.memo=$('memo').value;
+
+    }
+
+    let arr=
+      mode==='facility'
+      ?facilities
+      :staff;
+
+    let i=arr.findIndex(
+      a=>a.id===data.id
+    );
+
+    if(i<0){
+      arr.push(data);
+    }else{
+      arr[i]=data;
     }
 
     save();
-    closeForm();
+    close('formModal');
     render();
-  });
 
-  $("selectModeBtn").addEventListener("click", () => {
-    selectMode = true;
-    selectedIds.clear();
-    render();
-  });
+  };
 
-  $("doneSelectBtn").addEventListener("click", () => {
-    selectMode = false;
-    selectedIds.clear();
-    render();
-  });
+  $('formModal').classList.add('show');
 
-  $("bulkDeleteBtn").addEventListener("click", () => {
-    if (!selectedIds.size) return;
-    const count = selectedIds.size;
-    if (!confirm(`${count}件の用語を削除しますか？`)) return;
-    terms = terms.filter(t => !selectedIds.has(t.id));
-    selectedIds.clear();
-    selectMode = false;
-    save();
-    render();
-  });
+}
 
-  $("editBtn").addEventListener("click", () => {
-    const id = viewingId;
-    closeDetail();
-    if (id) openForm(id);
-  });
+function detail(label,value){
 
-  $("deleteBtn").addEventListener("click", () => {
-    const t = terms.find(x => x.id === viewingId);
-    if (!t) return;
-    if (!confirm(`「${t.term}」を削除しますか？`)) return;
-    terms = terms.filter(x => x.id !== viewingId);
-    save();
-    closeDetail();
-    render();
-  });
+  return `
+    <div class="detail-label">
+      ${label}
+    </div>
 
-  [$("formModal"), $("detailModal")].forEach(modal => {
-    modal.addEventListener("click", e => {
-      if (e.target === modal) modal.classList.remove("show");
-    });
-  });
+    <div class="detail-value">
+      ${esc(value||'未入力')}
+    </div>
+  `;
 
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
+
+function openDetail(id){
+
+  let x=
+    (mode==='facility'
+      ?facilities
+      :staff
+    ).find(a=>a.id===id);
+
+  if(!x)return;
+
+  $('detailTitle').textContent=x.name;
+
+  let html='';
+
+  if(mode==='facility'){
+
+    let ss=staff.filter(
+      s=>s.facilityId===id
+    );
+
+    html=
+      detail('施設種別',x.type)+
+      detail('住所',x.address)+
+      detail('担当者',x.contact)+
+      detail('担当者の役職',x.role)+
+      detail(
+        '派遣スタッフ',
+        ss.length
+        ?ss.map(s=>s.name).join('\n')
+        :'無'
+      )+
+      detail('メモ',x.memo);
+
+  }else{
+
+    let f=facilities.find(
+      f=>f.id===x.facilityId
+    );
+
+    html=
+      detail('年齢',x.age+'歳')+
+      detail('性別',x.gender)+
+      detail(
+        '保有資格・研修',
+        (x.quals||[]).join('、')
+      )+
+      detail('経験',x.experience)+
+      detail(
+        '現在の派遣先',
+        f?.name||'施設無'
+      )+
+      detail('メモ',x.memo)+
+      detail(
+        '派遣履歴',
+        (x.history||[])
+          .map(h=>
+            `${h.facilityName}（${h.start||'開始日未入力'} ～ ${h.end||'終了日未入力'}）`
+          )
+          .join('\n')
+        ||
+        'なし'
+      );
+
   }
 
+  html+=`
+
+    <div class="actions">
+
+      <button
+        class="primary"
+        id="edit"
+      >
+        編集
+      </button>
+
+      <button
+        class="danger"
+        id="del"
+      >
+        削除
+      </button>
+
+    </div>
+
+  `;
+
+  $('detail').innerHTML=html;
+
+  $('edit').onclick=()=>{
+    close('detailModal');
+    openForm(id);
+  };
+
+  $('del').onclick=()=>{
+
+    if(!confirm('削除しますか？'))return;
+
+    if(mode==='facility'){
+
+      facilities=
+        facilities.filter(
+          a=>a.id!==id
+        );
+
+    }else{
+
+      staff=
+        staff.filter(
+          a=>a.id!==id
+        );
+
+    }
+
+    save();
+    close('detailModal');
+    render();
+
+  };
+
+  $('detailModal').classList.add('show');
+
+}
+
+function close(id){
+  $(id).classList.remove('show');
+}
+
+$('facilityTab').onclick=()=>{
+  mode='facility';
+  $('searchInput').value='';
   render();
-})();
+};
+
+$('staffTab').onclick=()=>{
+  mode='staff';
+  $('searchInput').value='';
+  render();
+};
+
+$('addBtn').onclick=()=>{
+  openForm();
+};
+
+$('searchBtn').onclick=()=>{
+
+  $('searchArea').style.display=
+    $('searchArea').style.display==='none'
+    ?'block'
+    :'none';
+
+  $('searchInput').focus();
+
+};
+
+$('searchInput').oninput=render;
+
+$('formClose').onclick=()=>{
+  close('formModal');
+};
+
+$('detailClose').onclick=()=>{
+  close('detailModal');
+};
+
+render();
+
 </script>
+
 </body>
 </html>
