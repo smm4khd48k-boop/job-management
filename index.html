@@ -19,11 +19,18 @@ h1{font-size:24px;margin:0}.count{font-size:11px;color:var(--sub);margin-top:3px
 .btn{border:0;border-radius:12px;padding:10px 13px;background:#fff;box-shadow:0 4px 16px #0000000b}.primary{background:var(--text);color:#fff}
 .search{width:100%;border:0;border-radius:14px;padding:13px 14px;background:#fff;box-shadow:0 4px 16px #0000000b;margin-bottom:12px}
 .list{display:grid;gap:8px}.row{background:#fff;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;padding:13px 8px;cursor:pointer}
-.row-name{font-weight:700;font-size:15px}.row-sub,.row-meta{font-size:11px;color:var(--sub);margin-top:4px}
-.row.facility-empty{border-left:5px solid #222}
-.row.facility-active{border-left:5px solid #1769aa}
-.row.staff-male{border-left:5px solid #1769aa;background:#f1f7fc}
-.row.staff-female{border-left:5px solid #b4232c;background:#fff3f4}
+.row-name{font-weight:700;font-size:15px}
+.facility-row,.staff-row{display:grid;align-items:center;gap:10px}
+.facility-row{grid-template-columns:minmax(120px,1.15fr) minmax(120px,1fr) minmax(150px,1.4fr)}
+.staff-row{grid-template-columns:1fr auto}
+.row-center{font-size:11px;color:var(--sub);line-height:1.6}
+.row-staff{font-size:11px;color:var(--sub);text-align:right;line-height:1.5}
+.row-destination{font-size:11px;color:var(--sub);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub,.row-meta{font-size:11px;color:var(--sub);margin-top:4px}
+.row.facility-empty{}.row.facility-empty .row-name{color:#222}
+.row.facility-active{}.row.facility-active .row-name{color:#1769aa}
+.row.staff-male{;background:#f1f7fc}.row.staff-male .row-name{color:#1769aa}
+.row.staff-female{;background:#fff3f4}.row.staff-female .row-name{color:#b4232c}
 .kana{font-size:11px;font-weight:700;color:var(--sub);padding:10px 4px 3px}
 .empty{background:#fff;border-radius:14px;padding:32px;text-align:center;color:var(--sub);font-size:13px}
 .modal{position:fixed;inset:0;background:#0006;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:20}.modal.show{display:flex}
@@ -47,6 +54,11 @@ textarea{min-height:100px;resize:vertical}.multi{display:grid;gap:7px;grid-templ
 .selected-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .chip{border:1px solid var(--line);border-radius:999px;padding:6px 9px;background:#fff;font-size:11px}
 .note{font-size:11px;color:var(--sub);line-height:1.5;margin-top:6px}
+@media(max-width:560px){
+.facility-row{grid-template-columns:minmax(95px,1fr) minmax(95px,1fr) minmax(120px,1.2fr)}
+.facility-row .row-name{font-size:14px}
+.row-staff,.row-destination{font-size:10px}
+}
 @media(min-width:700px){.modal{align-items:center}.sheet{border-radius:22px}}
 </style>
 </head>
@@ -118,17 +130,16 @@ function render(){
   if(first!==last){html+=`<div class="kana">${esc(first)}</div>`;last=first}
   if(mode==='facility'){
    const ss=staff.filter(s=>s.facilityId===x.id);
-   html+=`<button class="row ${ss.length?'facility-active':'facility-empty'}" data-id="${esc(x.id)}">
+   html+=`<button class="row facility-row ${ss.length?'facility-active':'facility-empty'}" data-id="${esc(x.id)}">
    <div class="row-name">${esc(x.name)}</div>
-   <div class="row-sub">${esc(x.type||'種別未登録')}　担当者：${esc(x.contact||'未登録')}</div>
-   <div class="row-meta">派遣スタッフ：${ss.length?ss.map(s=>esc(s.name)).join('、'):'無'}</div>
+   <div class="row-center"><div>${esc(x.type||'種別未登録')}</div><div>担当者：${esc(x.contact||'未登録')}</div></div>
+   <div class="row-staff">派遣スタッフ：${ss.length?ss.map(s=>esc(s.name)).join('、'):'無'}</div>
    </button>`;
   }else{
    const f=facilities.find(f=>f.id===x.facilityId);
-   html+=`<button class="row ${x.gender==='男性'?'staff-male':x.gender==='女性'?'staff-female':''}" data-id="${esc(x.id)}">
+   html+=`<button class="row staff-row ${x.gender==='男性'?'staff-male':x.gender==='女性'?'staff-female':''}" data-id="${esc(x.id)}">
    <div class="row-name">${esc(x.name)}</div>
-   <div class="row-sub">${esc(x.kana||'ふりがな未入力')}</div>
-   <div class="row-meta">派遣先：${esc(f?.name||'施設無')}</div>
+   <div class="row-destination">${esc(f?.name||'施設無')}</div>
    </button>`;
   }
  });
