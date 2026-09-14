@@ -21,16 +21,16 @@ h1{font-size:24px;margin:0}.count{font-size:11px;color:var(--sub);margin-top:3px
 .list{display:grid;gap:8px}.row{background:#fff;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;padding:13px 8px;cursor:pointer}
 .row-name{font-weight:700;font-size:15px}
 .facility-row,.staff-row{display:grid;align-items:center;gap:10px}
-.facility-row{grid-template-columns:minmax(120px,1.15fr) minmax(120px,1fr) minmax(150px,1.4fr)}
+.facility-row{grid-template-columns:minmax(150px,1.5fr) minmax(110px,0.8fr) minmax(55px,0.5fr)}
 .staff-row{grid-template-columns:1fr auto}
 .row-center{font-size:11px;color:var(--sub);line-height:1.6}
 .row-staff{font-size:11px;color:var(--sub);text-align:right;line-height:1.5}
 .row-destination{font-size:11px;color:var(--sub);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-sub,.row-meta{font-size:11px;color:var(--sub);margin-top:4px}
 .row.facility-empty{}.row.facility-empty .row-name{color:#222}
-.row.facility-active{}.row.facility-active .row-name{color:#1769aa}
-.row.staff-male{;background:#f1f7fc}.row.staff-male .row-name{color:#1769aa}
-.row.staff-female{;background:#fff3f4}.row.staff-female .row-name{color:#b4232c}
+.row.facility-active{}.row.facility-active .row-name{color:#0b4f8a}
+.row.staff-male{;background:#f1f7fc}.row.staff-male .row-name{color:#0b4f8a}
+.row.staff-female{;background:#fff3f4}.row.staff-female .row-name{color:#8f1d24}
 .kana{font-size:11px;font-weight:700;color:var(--sub);padding:10px 4px 3px}
 .empty{background:#fff;border-radius:14px;padding:32px;text-align:center;color:var(--sub);font-size:13px}
 .modal{position:fixed;inset:0;background:#0006;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:20}.modal.show{display:flex}
@@ -55,7 +55,7 @@ textarea{min-height:100px;resize:vertical}.multi{display:grid;gap:7px;grid-templ
 .chip{border:1px solid var(--line);border-radius:999px;padding:6px 9px;background:#fff;font-size:11px}
 .note{font-size:11px;color:var(--sub);line-height:1.5;margin-top:6px}
 @media(max-width:560px){
-.facility-row{grid-template-columns:minmax(95px,1fr) minmax(95px,1fr) minmax(120px,1.2fr)}
+.facility-row{grid-template-columns:minmax(130px,1.5fr) minmax(95px,0.8fr) minmax(45px,0.5fr)}
 .facility-row .row-name{font-size:14px}
 .row-staff,.row-destination{font-size:10px}
 }
@@ -96,7 +96,8 @@ const $=id=>document.getElementById(id);
 function save(){localStorage.setItem('facilities',JSON.stringify(facilities));localStorage.setItem('staff',JSON.stringify(staff))}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function hira(s){return String(s||'').replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/ー/g,'ー').trim()}
-function kanaKey(x){return hira(x.kana||x.name||'').localeCompare(hira(x.kana||x.name||''),'ja')}
+function kanaKey(x){return hira(x.kana||x.name||'')}
+function compareKana(a,b){return kanaKey(a).localeCompare(kanaKey(b),'ja')}
 function today(){return new Date().toISOString().slice(0,10)}
 function normalizeData(){
  staff.forEach(s=>{if(!Array.isArray(s.quals))s.quals=[];if(!Array.isArray(s.history))s.history=[];if(s.kana==null)s.kana='';if(s.facilityId==null)s.facilityId=''});
@@ -121,7 +122,7 @@ function render(){
    return hira([x.name,x.kana,x.age,x.quals?.join(' '),x.experience,f?.name,f?.type,x.memo].join(' ')).includes(q);
   });
  }
- arr.sort((a,b)=>kanaKey(a,b));
+ arr.sort(compareKana);
 
  let html='',last='';
  arr.forEach(x=>{
@@ -133,7 +134,7 @@ function render(){
    html+=`<button class="row facility-row ${ss.length?'facility-active':'facility-empty'}" data-id="${esc(x.id)}">
    <div class="row-name">${esc(x.name)}</div>
    <div class="row-center"><div>${esc(x.type||'種別未登録')}</div><div>担当者：${esc(x.contact||'未登録')}</div></div>
-   <div class="row-staff">派遣スタッフ：${ss.length?ss.map(s=>esc(s.name)).join('、'):'無'}</div>
+   <div class="row-staff">${ss.length}名</div>
    </button>`;
   }else{
    const f=facilities.find(f=>f.id===x.facilityId);
@@ -174,7 +175,8 @@ function staffPicker(facilityId){
 
 function drawFacilityPicker(currentId){
  const q=hira(($('facilitySearch')?.value||'').trim());
- const list=facilities.filter(f=>!q||hira([f.name,f.kana,f.type,f.address].join(' ')).includes(q)).sort((a,b)=>kanaKey(a,b));
+ if(!q){ $('facilityPickList').innerHTML='<div class="note">施設名・ふりがな・施設種別などを入力して検索してください</div>'; return; }
+ const list=facilities.filter(f=>hira([f.name,f.kana,f.type,f.address].join(' ')).includes(q)).sort(compareKana);
  $('facilityPickList').innerHTML=list.map(f=>`<button type="button" class="pickitem ${currentId===f.id?'selected':''}" data-fid="${esc(f.id)}">${esc(f.name)}<br><small>${esc(f.kana||'ふりがな未入力')}　${esc(f.type||'')}</small></button>`).join('')||'<div class="note">該当する施設がありません</div>';
  document.querySelectorAll('[data-fid]').forEach(b=>b.onclick=()=>{
   const old=$('facilityId').value; const next=b.dataset.fid;
@@ -189,7 +191,7 @@ function drawStaffPicker(facilityId){
  if(!q){
   $('staffPickList').innerHTML='<div class="note">スタッフ名・ふりがな・資格などを入力して検索してください</div>';
  }else{
-  const list=staff.filter(s=>hira([s.name,s.kana,s.quals?.join(' ')].join(' ')).includes(q)).sort((a,b)=>kanaKey(a,b));
+  const list=staff.filter(s=>hira([s.name,s.kana,s.quals?.join(' ')].join(' ')).includes(q)).sort(compareKana);
   $('staffPickList').innerHTML=list.map(s=>`<button type="button" class="pickitem ${selected.has(s.id)?'selected':''}" data-sid="${esc(s.id)}">${esc(s.name)}<br><small>${esc(s.kana||'ふりがな未入力')}</small></button>`).join('')||'<div class="note">該当するスタッフがいません</div>';
  }
 
