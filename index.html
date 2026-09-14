@@ -19,7 +19,12 @@ h1{font-size:24px;margin:0}.count{font-size:11px;color:var(--sub);margin-top:3px
 .btn{border:0;border-radius:12px;padding:10px 13px;background:#fff;box-shadow:0 4px 16px #0000000b}.primary{background:var(--text);color:#fff}
 .search{width:100%;border:0;border-radius:14px;padding:13px 14px;background:#fff;box-shadow:0 4px 16px #0000000b;margin-bottom:12px}
 .list{display:grid;gap:8px}.row{background:#fff;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;padding:13px 8px;cursor:pointer}
-.row-name{font-weight:700;font-size:15px}.row-sub,.row-meta{font-size:11px;color:var(--sub);margin-top:4px}.kana{font-size:11px;font-weight:700;color:var(--sub);padding:10px 4px 3px}
+.row-name{font-weight:700;font-size:15px}.row-sub,.row-meta{font-size:11px;color:var(--sub);margin-top:4px}
+.row.facility-empty{border-left:5px solid #222}
+.row.facility-active{border-left:5px solid #1769aa}
+.row.staff-male{border-left:5px solid #1769aa;background:#f1f7fc}
+.row.staff-female{border-left:5px solid #b4232c;background:#fff3f4}
+.kana{font-size:11px;font-weight:700;color:var(--sub);padding:10px 4px 3px}
 .empty{background:#fff;border-radius:14px;padding:32px;text-align:center;color:var(--sub);font-size:13px}
 .modal{position:fixed;inset:0;background:#0006;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:20}.modal.show{display:flex}
 .sheet{width:min(760px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:22px 22px 12px 12px;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
@@ -113,14 +118,14 @@ function render(){
   if(first!==last){html+=`<div class="kana">${esc(first)}</div>`;last=first}
   if(mode==='facility'){
    const ss=staff.filter(s=>s.facilityId===x.id);
-   html+=`<button class="row" data-id="${esc(x.id)}">
+   html+=`<button class="row ${ss.length?'facility-active':'facility-empty'}" data-id="${esc(x.id)}">
    <div class="row-name">${esc(x.name)}</div>
    <div class="row-sub">${esc(x.type||'種別未登録')}　担当者：${esc(x.contact||'未登録')}</div>
    <div class="row-meta">派遣スタッフ：${ss.length?ss.map(s=>esc(s.name)).join('、'):'無'}</div>
    </button>`;
   }else{
    const f=facilities.find(f=>f.id===x.facilityId);
-   html+=`<button class="row" data-id="${esc(x.id)}">
+   html+=`<button class="row ${x.gender==='男性'?'staff-male':x.gender==='女性'?'staff-female':''}" data-id="${esc(x.id)}">
    <div class="row-name">${esc(x.name)}</div>
    <div class="row-sub">${esc(x.kana||'ふりがな未入力')}</div>
    <div class="row-meta">派遣先：${esc(f?.name||'施設無')}</div>
@@ -168,9 +173,17 @@ function drawFacilityPicker(currentId){
 function drawStaffPicker(facilityId){
  const q=hira(($('staffSearch')?.value||'').trim());
  const selected=new Set(staff.filter(s=>s.facilityId===facilityId).map(s=>s.id));
- const list=staff.filter(s=>!q||hira([s.name,s.kana,s.quals?.join(' ')].join(' ')).includes(q)).sort((a,b)=>kanaKey(a,b));
- $('staffPickList').innerHTML=list.map(s=>`<button type="button" class="pickitem ${selected.has(s.id)?'selected':''}" data-sid="${esc(s.id)}">${esc(s.name)}<br><small>${esc(s.kana||'ふりがな未入力')}</small></button>`).join('')||'<div class="note">該当するスタッフがいません</div>';
+
+ // 検索文字が入力されるまでスタッフ一覧は表示しない
+ if(!q){
+  $('staffPickList').innerHTML='<div class="note">スタッフ名・ふりがな・資格などを入力して検索してください</div>';
+ }else{
+  const list=staff.filter(s=>hira([s.name,s.kana,s.quals?.join(' ')].join(' ')).includes(q)).sort((a,b)=>kanaKey(a,b));
+  $('staffPickList').innerHTML=list.map(s=>`<button type="button" class="pickitem ${selected.has(s.id)?'selected':''}" data-sid="${esc(s.id)}">${esc(s.name)}<br><small>${esc(s.kana||'ふりがな未入力')}</small></button>`).join('')||'<div class="note">該当するスタッフがいません</div>';
+ }
+
  $('selectedStaff').innerHTML=[...selected].map(id=>{const s=staff.find(x=>x.id===id);return `<span class="chip">${esc(s?.name||'')}</span>`}).join('');
+
  document.querySelectorAll('[data-sid]').forEach(b=>b.onclick=()=>{
   const sid=b.dataset.sid; const s=staff.find(x=>x.id===sid); if(!s)return;
   if(s.facilityId===facilityId)s.facilityId='';
