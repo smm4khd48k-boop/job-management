@@ -8,1083 +8,242 @@
 <meta name="apple-mobile-web-app-title" content="仕事管理">
 <link rel="manifest" href="manifest.json">
 <title>仕事管理</title>
-
 <style>
-:root{
-  --bg:#f5f6f8;
-  --card:#fff;
-  --text:#1d1d1f;
-  --sub:#6e6e73;
-  --line:#e5e5ea;
-  --danger:#c62828;
-  --accent:#2563eb
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif
-}
-.app{
-  max-width:760px;
-  margin:auto;
-  min-height:100vh;
-  padding:22px 16px 100px
-}
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:16px
-}
-h1{font-size:24px;margin:0}
-.count{
-  font-size:11px;
-  color:var(--sub);
-  margin-top:3px
-}
-.top-actions{
-  display:flex;
-  gap:8px
-}
-.btn{
-  border:0;
-  border-radius:12px;
-  padding:10px 13px;
-  background:#fff;
-  box-shadow:0 4px 16px #0000000b
-}
-.primary{
-  background:var(--text);
-  color:#fff
-}
-.search{
-  width:100%;
-  border:0;
-  border-radius:14px;
-  padding:13px 14px;
-  background:#fff;
-  box-shadow:0 4px 16px #0000000b;
-  margin-bottom:12px
-}
-.tabs{
-  display:flex;
-  background:#e9e9ed;
-  border-radius:13px;
-  padding:3px;
-  margin-bottom:12px
-}
-.tab{
-  flex:1;
-  border:0;
-  border-radius:10px;
-  padding:10px;
-  background:transparent
-}
-.tab.active{
-  background:#fff;
-  font-weight:700;
-  box-shadow:0 2px 8px #0000000b
-}
-.list{
-  display:grid;
-  gap:8px
-}
-.row{
-  background:#fff;
-  border:0;
-  border-bottom:1px solid var(--line);
-  width:100%;
-  text-align:left;
-  padding:13px 8px;
-  cursor:pointer
-}
-.row-name{
-  font-weight:700;
-  font-size:15px
-}
-.row-sub{
-  font-size:11px;
-  color:var(--sub);
-  margin-top:4px
-}
-.row-meta{
-  font-size:11px;
-  color:var(--sub);
-  margin-top:3px
-}
-.kana{
-  font-size:11px;
-  font-weight:700;
-  color:var(--sub);
-  padding:10px 4px 3px
-}
-.empty{
-  background:#fff;
-  border-radius:14px;
-  padding:32px;
-  text-align:center;
-  color:var(--sub);
-  font-size:13px
-}
-.modal{
-  position:fixed;
-  inset:0;
-  background:#0006;
-  display:none;
-  align-items:flex-end;
-  justify-content:center;
-  padding:12px;
-  z-index:20
-}
-.modal.show{display:flex}
-.sheet{
-  width:min(760px,100%);
-  max-height:94vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:22px 22px 12px 12px;
-  padding:20px 16px calc(20px + env(safe-area-inset-bottom))
-}
-.sheet-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:14px
-}
-.sheet-head h2{
-  font-size:20px;
-  margin:0
-}
-.close{
-  border:0;
-  background:#f0f0f2;
-  border-radius:50%;
-  width:36px;
-  height:36px
-}
-.field{margin:12px 0}
-label{
-  display:block;
-  font-size:12px;
-  font-weight:700;
-  margin-bottom:6px
-}
-input,textarea,select{
-  width:100%;
-  border:1px solid var(--line);
-  border-radius:11px;
-  padding:11px 12px;
-  background:#fafafa
-}
-textarea{
-  min-height:100px;
-  resize:vertical
-}
-.multi{
-  display:grid;
-  gap:7px;
-  grid-template-columns:1fr 1fr
-}
-.check{
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:9px;
-  font-size:12px
-}
-.check input{
-  width:auto;
-  margin-right:6px
-}
-.actions{
-  display:grid;
-  gap:8px;
-  margin-top:18px
-}
-.actions button{
-  border:0;
-  border-radius:12px;
-  padding:12px
-}
-.detail-label{
-  font-size:10px;
-  color:var(--sub);
-  font-weight:700;
-  margin-top:14px
-}
-.detail-value{
-  margin-top:4px;
-  white-space:pre-wrap;
-  line-height:1.6
-}
-.history{
-  padding:10px 0;
-  border-bottom:1px solid var(--line)
-}
-.danger{
-  color:var(--danger);
-  background:#fff0f0
-}
-.bottom{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  background:#fff;
-  border-top:1px solid var(--line);
-  display:flex;
-  padding:7px 12px calc(7px + env(safe-area-inset-bottom));
-  z-index:10
-}
-.bottom button{
-  flex:1;
-  border:0;
-  background:transparent;
-  padding:7px;
-  font-size:12px
-}
-.bottom .active{font-weight:700}
-
-@media(min-width:700px){
-  .modal{align-items:center}
-  .sheet{border-radius:22px}
-}
+:root{--bg:#f5f6f8;--card:#fff;--text:#1d1d1f;--sub:#6e6e73;--line:#e5e5ea;--danger:#c62828}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+.app{max-width:760px;margin:auto;min-height:100vh;padding:22px 16px 100px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+h1{font-size:24px;margin:0}.count{font-size:11px;color:var(--sub);margin-top:3px}.top-actions{display:flex;gap:8px}
+.btn{border:0;border-radius:12px;padding:10px 13px;background:#fff;box-shadow:0 4px 16px #0000000b}.primary{background:var(--text);color:#fff}
+.search{width:100%;border:0;border-radius:14px;padding:13px 14px;background:#fff;box-shadow:0 4px 16px #0000000b;margin-bottom:12px}
+.list{display:grid;gap:8px}.row{background:#fff;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;padding:13px 8px;cursor:pointer}
+.row-name{font-weight:700;font-size:15px}.row-sub,.row-meta{font-size:11px;color:var(--sub);margin-top:4px}.kana{font-size:11px;font-weight:700;color:var(--sub);padding:10px 4px 3px}
+.empty{background:#fff;border-radius:14px;padding:32px;text-align:center;color:var(--sub);font-size:13px}
+.modal{position:fixed;inset:0;background:#0006;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:20}.modal.show{display:flex}
+.sheet{width:min(760px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:22px 22px 12px 12px;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sheet-head h2{font-size:20px;margin:0}
+.close{border:0;background:#f0f0f2;border-radius:50%;width:36px;height:36px}.field{margin:12px 0}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 12px;background:#fafafa}
+textarea{min-height:100px;resize:vertical}.multi{display:grid;gap:7px;grid-template-columns:1fr 1fr}
+.check{border:1px solid var(--line);border-radius:10px;padding:9px;font-size:12px}.check input{width:auto;margin-right:6px}
+.actions{display:grid;gap:8px;margin-top:18px}.actions button{border:0;border-radius:12px;padding:12px}
+.detail-label{font-size:10px;color:var(--sub);font-weight:700;margin-top:14px}.detail-value{margin-top:4px;white-space:pre-wrap;line-height:1.6}
+.history{padding:10px 0;border-bottom:1px solid var(--line)}.danger{color:var(--danger);background:#fff0f0}
+.bottom{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;padding:7px 12px calc(7px + env(safe-area-inset-bottom));z-index:10}
+.bottom button{flex:1;border:0;background:transparent;padding:7px;font-size:12px}.bottom .active{font-weight:700}
+@media(min-width:700px){.modal{align-items:center}.sheet{border-radius:22px}}
 </style>
 </head>
-
 <body>
-
 <div class="app">
-
 <header>
-  <div>
-    <h1 id="title">施設</h1>
-    <div class="count" id="count"></div>
-  </div>
-
-  <div class="top-actions">
-    <button class="btn primary" id="addBtn">＋登録</button>
-    <button class="btn" id="searchBtn">検索</button>
-  </div>
+<div><h1 id="title">施設</h1><div class="count" id="count"></div></div>
+<div class="top-actions"><button class="btn primary" id="addBtn">＋登録</button><button class="btn" id="searchBtn">検索</button></div>
 </header>
-
-<div id="searchArea" style="display:none">
-  <input class="search" id="searchInput" placeholder="検索…">
-</div>
-
+<div id="searchArea" style="display:none"><input class="search" id="searchInput" placeholder="検索…"></div>
 <div id="list" class="list"></div>
-
 </div>
 
-<nav class="bottom">
-  <button id="facilityTab" class="active">施設</button>
-  <button id="staffTab">スタッフ</button>
-</nav>
+<nav class="bottom"><button id="facilityTab" class="active">施設</button><button id="staffTab">スタッフ</button></nav>
 
-<div class="modal" id="formModal">
-  <div class="sheet">
+<div class="modal" id="formModal"><div class="sheet">
+<div class="sheet-head"><h2 id="formTitle">施設登録</h2><button class="close" id="formClose">×</button></div>
+<form id="form"></form>
+</div></div>
 
-    <div class="sheet-head">
-      <h2 id="formTitle">施設登録</h2>
-      <button class="close" id="formClose">×</button>
-    </div>
-
-    <form id="form"></form>
-
-  </div>
-</div>
-
-<div class="modal" id="detailModal">
-  <div class="sheet">
-
-    <div class="sheet-head">
-      <h2 id="detailTitle">詳細</h2>
-      <button class="close" id="detailClose">×</button>
-    </div>
-
-    <div id="detail"></div>
-
-  </div>
-</div>
+<div class="modal" id="detailModal"><div class="sheet">
+<div class="sheet-head"><h2 id="detailTitle">詳細</h2><button class="close" id="detailClose">×</button></div>
+<div id="detail"></div>
+</div></div>
 
 <script>
-
-const FACILITY_TYPES=[
-  '病院',
-  '特養',
-  '老健',
-  'サ高住',
-  '住宅型有料老人ホーム',
-  '介護付有料老人ホーム',
-  'グループホーム',
-  'デイサービス',
-  'デイケア',
-  '小規模多機能',
-  '障がい者入所施設',
-  '障がい者グループホーム',
-  '就労継続支援B型',
-  '放課後等デイサービス',
-  'その他'
-];
-
-const QUALS=[
-  '無資格',
-  '認知症介護基礎研修',
-  '初任者研修',
-  '実務者研修',
-  '介護福祉士',
-  '看護師',
-  '准看護師',
-  'PT（理学療法士）',
-  'OT（作業療法士）',
-  'ST（言語聴覚士）',
-  'その他'
-];
+const FACILITY_TYPES=['病院','特養','老健','サ高住','住宅型有料老人ホーム','介護付有料老人ホーム','グループホーム','デイサービス','デイケア','小規模多機能','障がい者入所施設','障がい者グループホーム','就労継続支援B型','放課後等デイサービス','その他'];
+const QUALS=['無資格','認知症介護基礎研修','初任者研修','実務者研修','介護福祉士','看護師','准看護師','PT（理学療法士）','OT（作業療法士）','ST（言語聴覚士）','その他'];
 
 let facilities=JSON.parse(localStorage.getItem('facilities')||'[]');
 let staff=JSON.parse(localStorage.getItem('staff')||'[]');
-
-let mode='facility';
-let editing=null;
+let mode='facility',editing=null;
 
 const $=id=>document.getElementById(id);
-
-function save(){
-  localStorage.setItem('facilities',JSON.stringify(facilities));
-  localStorage.setItem('staff',JSON.stringify(staff));
-}
-
-function esc(s){
-  return String(s??'').replace(/[&<>"']/g,c=>({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[c]));
-}
+function save(){localStorage.setItem('facilities',JSON.stringify(facilities));localStorage.setItem('staff',JSON.stringify(staff))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
 function render(){
+$('title').textContent=mode==='facility'?'施設':'スタッフ';
+$('count').textContent=(mode==='facility'?facilities:staff).length+'件';
+$('facilityTab').classList.toggle('active',mode==='facility');
+$('staffTab').classList.toggle('active',mode==='staff');
 
-  $('title').textContent=mode==='facility'?'施設':'スタッフ';
+let arr=mode==='facility'?facilities:staff,q=$('searchInput').value.trim();
+if(q)arr=arr.filter(x=>Object.values(x).join(' ').includes(q));
+arr=[...arr].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ja'));
 
-  $('count').textContent=
-    (mode==='facility'?facilities:staff).length+'件';
+let html='',last='';
+arr.forEach(x=>{
+let first=(x.name||'').trim().charAt(0)||'その他';
+if(first!==last){html+=`<div class="kana">${esc(first)}</div>`;last=first}
 
-  $('facilityTab').classList.toggle(
-    'active',
-    mode==='facility'
-  );
+if(mode==='facility'){
+let ss=staff.filter(s=>s.facilityId===x.id);
+html+=`<button class="row" data-id="${x.id}">
+<div class="row-name">${esc(x.name)}</div>
+<div class="row-sub">${esc(x.type||'種別未登録')}　担当者：${esc(x.contact||'未登録')}</div>
+<div class="row-meta">派遣スタッフ：${ss.length?ss.map(s=>esc(s.name)).join('、'):'無'}</div>
+</button>`;
+}else{
+let f=facilities.find(f=>f.id===x.facilityId);
+html+=`<button class="row" data-id="${x.id}">
+<div class="row-name">${esc(x.name)}</div>
+<div class="row-sub">${esc(x.age)}歳　${esc(x.gender)}</div>
+<div class="row-meta">派遣先：${esc(f?.name||'施設無')}</div>
+</button>`;
+}
+});
 
-  $('staffTab').classList.toggle(
-    'active',
-    mode==='staff'
-  );
-
-  let arr=mode==='facility'?facilities:staff;
-
-  let q=$('searchInput').value.trim();
-
-  if(q){
-
-    arr=arr.filter(x=>
-      Object.values(x).join(' ').includes(q)
-    );
-
-  }
-
-  arr=[...arr].sort((a,b)=>
-    String(a.name||'').localeCompare(
-      String(b.name||''),
-      'ja'
-    )
-  );
-
-  let html='';
-  let last='';
-
-  arr.forEach(x=>{
-
-    let first=
-      (x.name||'').trim().charAt(0)||'その他';
-
-    if(first!==last){
-
-      html+=`
-        <div class="kana">
-          ${esc(first)}
-        </div>
-      `;
-
-      last=first;
-
-    }
-
-    if(mode==='facility'){
-
-      let ss=staff.filter(
-        s=>s.facilityId===x.id
-      );
-
-      html+=`
-        <button class="row" data-id="${x.id}">
-
-          <div class="row-name">
-            ${esc(x.name)}
-          </div>
-
-          <div class="row-sub">
-            ${esc(x.type||'種別未登録')}
-            　
-            担当者：${esc(x.contact||'未登録')}
-          </div>
-
-          <div class="row-meta">
-            派遣スタッフ：
-            ${
-              ss.length
-              ?ss.map(s=>esc(s.name)).join('、')
-              :'無'
-            }
-          </div>
-
-        </button>
-      `;
-
-    }else{
-
-      let f=facilities.find(
-        f=>f.id===x.facilityId
-      );
-
-      html+=`
-        <button class="row" data-id="${x.id}">
-
-          <div class="row-name">
-            ${esc(x.name)}
-          </div>
-
-          <div class="row-sub">
-            ${esc(x.age)}歳　
-            ${esc(x.gender)}
-          </div>
-
-          <div class="row-meta">
-            派遣先：
-            ${esc(f?.name||'施設無')}
-          </div>
-
-        </button>
-      `;
-
-    }
-
-  });
-
-  $('list').innerHTML=
-    html ||
-    '<div class="empty">登録されている情報はありません</div>';
-
-  document.querySelectorAll('.row')
-    .forEach(b=>{
-      b.onclick=()=>{
-        openDetail(b.dataset.id);
-      };
-    });
+$('list').innerHTML=html||'<div class="empty">登録されている情報はありません</div>';
+document.querySelectorAll('.row').forEach(b=>b.onclick=()=>openDetail(b.dataset.id));
 }
 
-function input(
-  id,
-  label,
-  val='',
-  type='text',
-  required=false
-){
-
-  return `
-    <div class="field">
-
-      <label for="${id}">
-        ${label}
-      </label>
-
-      <input
-        id="${id}"
-        type="${type==='number'?'number':'text'}"
-        value="${esc(val)}"
-        ${required?'required':''}
-      >
-
-    </div>
-  `;
+function input(id,label,val='',type='text',required=false){
+return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="${type==='number'?'number':'text'}" value="${esc(val)}" ${required?'required':''}></div>`;
 }
-
-function textarea(
-  id,
-  label,
-  val=''
-){
-
-  return `
-    <div class="field">
-
-      <label for="${id}">
-        ${label}
-      </label>
-
-      <textarea id="${id}">${esc(val)}</textarea>
-
-    </div>
-  `;
+function textarea(id,label,val=''){
+return `<div class="field"><label for="${id}">${label}</label><textarea id="${id}">${esc(val)}</textarea></div>`;
 }
-
-function select(
-  id,
-  label,
-  opts,
-  val=''
-){
-
-  return `
-    <div class="field">
-
-      <label for="${id}">
-        ${label}
-      </label>
-
-      <select id="${id}" required>
-
-        <option value="">
-          選択してください
-        </option>
-
-        ${
-          opts.map(o=>`
-            <option
-              ${o===val?'selected':''}
-            >
-              ${esc(o)}
-            </option>
-          `).join('')
-        }
-
-      </select>
-
-    </div>
-  `;
+function select(id,label,opts,val=''){
+return `<div class="field"><label for="${id}">${label}</label><select id="${id}" required><option value="">選択してください</option>${opts.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`;
 }
 
 function openForm(id=null){
-
-  editing=id;
-
-  $('formTitle').textContent=
-    (mode==='facility'?'施設':'スタッフ')+
-    (id?'編集':'登録');
-
-  let x=
-    (mode==='facility'
-      ?facilities
-      :staff
-    ).find(a=>a.id===id)||{};
-
-  let f=$('form');
-
-  if(mode==='facility'){
-
-    f.innerHTML=`
-
-      ${input(
-        'name',
-        '施設名',
-        x.name,
-        'text',
-        true
-      )}
-
-      ${select(
-        'type',
-        '施設種別',
-        FACILITY_TYPES,
-        x.type
-      )}
-
-      ${input(
-        'address',
-        '住所（〇〇町まで）',
-        x.address
-      )}
-
-      ${input(
-        'contact',
-        '担当者',
-        x.contact
-      )}
-
-      ${input(
-        'role',
-        '担当者の役職',
-        x.role
-      )}
-
-      <div class="field">
-
-        <label>
-          担当スタッフ
-        </label>
-
-        <select id="facilityStaff">
-
-          <option value="">
-            選択なし
-          </option>
-
-          ${
-            staff.map(s=>`
-              <option
-                value="${s.id}"
-                ${staff.some(
-                  st=>st.id===s.id &&
-                  st.facilityId===x.id
-                )?'selected':''}
-              >
-                ${esc(s.name)}
-              </option>
-            `).join('')
-          }
-
-        </select>
-
-      </div>
-
-      ${textarea(
-        'memo',
-        'メモ',
-        x.memo
-      )}
-
-    `;
-
-  }else{
-
-    f.innerHTML=`
-
-      ${input(
-        'name',
-        '氏名',
-        x.name,
-        'text',
-        true
-      )}
-
-      ${input(
-        'age',
-        '年齢',
-        x.age,
-        'number',
-        true
-      )}
-
-      <div class="field">
-
-        <label>
-          性別
-        </label>
-
-        <select id="gender" required>
-
-          <option value="">
-            選択してください
-          </option>
-
-          <option
-            ${x.gender==='男性'?'selected':''}
-          >
-            男性
-          </option>
-
-          <option
-            ${x.gender==='女性'?'selected':''}
-          >
-            女性
-          </option>
-
-        </select>
-
-      </div>
-
-      <div class="field">
-
-        <label>
-          保有資格・研修（複数選択可）
-        </label>
-
-        <div class="multi">
-
-          ${
-            QUALS.map(q=>`
-              <label class="check">
-
-                <input
-                  type="checkbox"
-                  name="quals"
-                  value="${esc(q)}"
-                  ${
-                    (x.quals||[]).includes(q)
-                    ?'checked'
-                    :''
-                  }
-                >
-
-                ${esc(q)}
-
-              </label>
-            `).join('')
-          }
-
-        </div>
-
-      </div>
-
-      ${textarea(
-        'experience',
-        '経験',
-        x.experience
-      )}
-
-      <div class="field">
-
-        <label>
-          現在の派遣先
-        </label>
-
-        <select id="facilityId">
-
-          <option value="">
-            施設無
-          </option>
-
-          ${
-            facilities.map(a=>`
-              <option
-                value="${a.id}"
-                ${
-                  x.facilityId===a.id
-                  ?'selected'
-                  :''
-                }
-              >
-                ${esc(a.name)}
-              </option>
-            `).join('')
-          }
-
-        </select>
-
-      </div>
-
-      ${textarea(
-        'memo',
-        'メモ',
-        x.memo
-      )}
-
-      ${
-        id
-        ?`
-          <div class="field">
-
-            <label>
-              派遣履歴
-            </label>
-
-            ${
-              (x.history||[]).map(h=>`
-                <div class="history">
-
-                  ${esc(h.facilityName)}
-
-                  <br>
-
-                  <small>
-                    ${esc(h.start||'開始日未入力')}
-                    ～
-                    ${esc(h.end||'終了日未入力')}
-                  </small>
-
-                </div>
-              `).join('')
-              ||
-              '<div class="row-sub">履歴なし</div>'
-            }
-
-          </div>
-        `
-        :''
-      }
-
-    `;
-
-  }
-
-  f.onsubmit=e=>{
-
-    e.preventDefault();
-
-    let data={
-      ...x,
-      id:id||crypto.randomUUID()
-    };
-
-    if(mode==='facility'){
-
-      data.name=$('name').value;
-      data.type=$('type').value;
-      data.address=$('address').value;
-      data.contact=$('contact').value;
-      data.role=$('role').value;
-      data.memo=$('memo').value;
-
-      let sid=$('facilityStaff').value;
-
-      if(sid){
-
-        staff.forEach(s=>{
-
-          if(s.id===sid){
-            s.facilityId=data.id;
-          }
-
-        });
-
-      }
-
-    }else{
-
-      data.name=$('name').value;
-      data.age=$('age').value;
-      data.gender=$('gender').value;
-
-      data.quals=[
-        ...document.querySelectorAll(
-          '[name=quals]:checked'
-        )
-      ].map(e=>e.value);
-
-      data.experience=$('experience').value;
-      data.facilityId=$('facilityId').value;
-      data.memo=$('memo').value;
-
-    }
-
-    let arr=
-      mode==='facility'
-      ?facilities
-      :staff;
-
-    let i=arr.findIndex(
-      a=>a.id===data.id
-    );
-
-    if(i<0){
-      arr.push(data);
-    }else{
-      arr[i]=data;
-    }
-
-    save();
-    close('formModal');
-    render();
-
-  };
-
-  $('formModal').classList.add('show');
-
+editing=id;
+$('formTitle').textContent=(mode==='facility'?'施設':'スタッフ')+(id?'編集':'登録');
+
+let x=(mode==='facility'?facilities:staff).find(a=>a.id===id)||{};
+let f=$('form');
+
+if(mode==='facility'){
+f.innerHTML=`
+${input('name','施設名',x.name,'text',true)}
+${select('type','施設種別',FACILITY_TYPES,x.type)}
+${input('address','住所（〇〇町まで）',x.address)}
+${input('contact','担当者',x.contact)}
+${input('role','担当者の役職',x.role)}
+<div class="field">
+<label>担当スタッフ</label>
+<select id="facilityStaff">
+<option value="">選択なし</option>
+${staff.map(s=>`<option value="${s.id}" ${s.facilityId===x.id?'selected':''}>${esc(s.name)}</option>`).join('')}
+</select>
+</div>
+${textarea('memo','メモ',x.memo)}
+<div class="actions">
+<button type="submit" class="primary">${id?'変更を保存':'登録する'}</button>
+<button type="button" id="cancelForm">キャンセル</button>
+</div>`;
+}else{
+f.innerHTML=`
+${input('name','氏名',x.name,'text',true)}
+${input('age','年齢',x.age,'number',true)}
+<div class="field"><label>性別</label><select id="gender" required>
+<option value="">選択してください</option>
+<option ${x.gender==='男性'?'selected':''}>男性</option>
+<option ${x.gender==='女性'?'selected':''}>女性</option>
+</select></div>
+<div class="field"><label>保有資格・研修（複数選択可）</label>
+<div class="multi">${QUALS.map(q=>`<label class="check"><input type="checkbox" name="quals" value="${esc(q)}" ${(x.quals||[]).includes(q)?'checked':''}>${esc(q)}</label>`).join('')}</div>
+</div>
+${textarea('experience','経験',x.experience)}
+<div class="field"><label>現在の派遣先</label><select id="facilityId">
+<option value="">施設無</option>${facilities.map(a=>`<option value="${a.id}" ${x.facilityId===a.id?'selected':''}>${esc(a.name)}</option>`).join('')}
+</select></div>
+${textarea('memo','メモ',x.memo)}
+${id?`<div class="field"><label>派遣履歴</label>${(x.history||[]).map(h=>`<div class="history">${esc(h.facilityName)}<br><small>${esc(h.start||'開始日未入力')} ～ ${esc(h.end||'終了日未入力')}</small></div>`).join('')||'<div class="row-sub">履歴なし</div>'}</div>`:''}
+<div class="actions">
+<button type="submit" class="primary">${id?'変更を保存':'登録する'}</button>
+<button type="button" id="cancelForm">キャンセル</button>
+</div>`;
+}
+
+$('cancelForm').onclick=()=>close('formModal');
+
+f.onsubmit=e=>{
+e.preventDefault();
+let data={...x,id:id||crypto.randomUUID()};
+
+if(mode==='facility'){
+data.name=$('name').value;
+data.type=$('type').value;
+data.address=$('address').value;
+data.contact=$('contact').value;
+data.role=$('role').value;
+data.memo=$('memo').value;
+let sid=$('facilityStaff').value;
+if(sid)staff.forEach(s=>{if(s.id===sid)s.facilityId=data.id});
+}else{
+data.name=$('name').value;
+data.age=$('age').value;
+data.gender=$('gender').value;
+data.quals=[...document.querySelectorAll('[name=quals]:checked')].map(e=>e.value);
+data.experience=$('experience').value;
+data.facilityId=$('facilityId').value;
+data.memo=$('memo').value;
+}
+
+let arr=mode==='facility'?facilities:staff;
+let i=arr.findIndex(a=>a.id===data.id);
+if(i<0)arr.push(data);else arr[i]=data;
+
+save();close('formModal');render();
+};
+
+$('formModal').classList.add('show');
 }
 
 function detail(label,value){
-
-  return `
-    <div class="detail-label">
-      ${label}
-    </div>
-
-    <div class="detail-value">
-      ${esc(value||'未入力')}
-    </div>
-  `;
-
+return `<div class="detail-label">${label}</div><div class="detail-value">${esc(value||'未入力')}</div>`;
 }
 
 function openDetail(id){
+let x=(mode==='facility'?facilities:staff).find(a=>a.id===id);
+if(!x)return;
+$('detailTitle').textContent=x.name;
+let html='';
 
-  let x=
-    (mode==='facility'
-      ?facilities
-      :staff
-    ).find(a=>a.id===id);
-
-  if(!x)return;
-
-  $('detailTitle').textContent=x.name;
-
-  let html='';
-
-  if(mode==='facility'){
-
-    let ss=staff.filter(
-      s=>s.facilityId===id
-    );
-
-    html=
-      detail('施設種別',x.type)+
-      detail('住所',x.address)+
-      detail('担当者',x.contact)+
-      detail('担当者の役職',x.role)+
-      detail(
-        '派遣スタッフ',
-        ss.length
-        ?ss.map(s=>s.name).join('\n')
-        :'無'
-      )+
-      detail('メモ',x.memo);
-
-  }else{
-
-    let f=facilities.find(
-      f=>f.id===x.facilityId
-    );
-
-    html=
-      detail('年齢',x.age+'歳')+
-      detail('性別',x.gender)+
-      detail(
-        '保有資格・研修',
-        (x.quals||[]).join('、')
-      )+
-      detail('経験',x.experience)+
-      detail(
-        '現在の派遣先',
-        f?.name||'施設無'
-      )+
-      detail('メモ',x.memo)+
-      detail(
-        '派遣履歴',
-        (x.history||[])
-          .map(h=>
-            `${h.facilityName}（${h.start||'開始日未入力'} ～ ${h.end||'終了日未入力'}）`
-          )
-          .join('\n')
-        ||
-        'なし'
-      );
-
-  }
-
-  html+=`
-
-    <div class="actions">
-
-      <button
-        class="primary"
-        id="edit"
-      >
-        編集
-      </button>
-
-      <button
-        class="danger"
-        id="del"
-      >
-        削除
-      </button>
-
-    </div>
-
-  `;
-
-  $('detail').innerHTML=html;
-
-  $('edit').onclick=()=>{
-    close('detailModal');
-    openForm(id);
-  };
-
-  $('del').onclick=()=>{
-
-    if(!confirm('削除しますか？'))return;
-
-    if(mode==='facility'){
-
-      facilities=
-        facilities.filter(
-          a=>a.id!==id
-        );
-
-    }else{
-
-      staff=
-        staff.filter(
-          a=>a.id!==id
-        );
-
-    }
-
-    save();
-    close('detailModal');
-    render();
-
-  };
-
-  $('detailModal').classList.add('show');
-
+if(mode==='facility'){
+let ss=staff.filter(s=>s.facilityId===id);
+html=detail('施設種別',x.type)+detail('住所',x.address)+detail('担当者',x.contact)+detail('担当者の役職',x.role)+detail('派遣スタッフ',ss.length?ss.map(s=>s.name).join('\n'):'無')+detail('メモ',x.memo);
+}else{
+let f=facilities.find(f=>f.id===x.facilityId);
+html=detail('年齢',x.age+'歳')+detail('性別',x.gender)+detail('保有資格・研修',(x.quals||[]).join('、'))+detail('経験',x.experience)+detail('現在の派遣先',f?.name||'施設無')+detail('メモ',x.memo)+detail('派遣履歴',(x.history||[]).map(h=>`${h.facilityName}（${h.start||'開始日未入力'} ～ ${h.end||'終了日未入力'}）`).join('\n')||'なし');
 }
 
-function close(id){
-  $(id).classList.remove('show');
+html+=`<div class="actions"><button class="primary" id="edit">編集</button><button class="danger" id="del">削除</button></div>`;
+$('detail').innerHTML=html;
+
+$('edit').onclick=()=>{close('detailModal');openForm(id)};
+$('del').onclick=()=>{
+if(!confirm('削除しますか？'))return;
+if(mode==='facility')facilities=facilities.filter(a=>a.id!==id);else staff=staff.filter(a=>a.id!==id);
+save();close('detailModal');render();
+};
+$('detailModal').classList.add('show');
 }
 
-$('facilityTab').onclick=()=>{
-  mode='facility';
-  $('searchInput').value='';
-  render();
-};
+function close(id){$(id).classList.remove('show')}
 
-$('staffTab').onclick=()=>{
-  mode='staff';
-  $('searchInput').value='';
-  render();
-};
-
-$('addBtn').onclick=()=>{
-  openForm();
-};
-
+$('facilityTab').onclick=()=>{mode='facility';$('searchInput').value='';render()};
+$('staffTab').onclick=()=>{mode='staff';$('searchInput').value='';render()};
+$('addBtn').onclick=()=>openForm();
 $('searchBtn').onclick=()=>{
-
-  $('searchArea').style.display=
-    $('searchArea').style.display==='none'
-    ?'block'
-    :'none';
-
-  $('searchInput').focus();
-
+$('searchArea').style.display=$('searchArea').style.display==='none'?'block':'none';
+$('searchInput').focus();
 };
-
 $('searchInput').oninput=render;
-
-$('formClose').onclick=()=>{
-  close('formModal');
-};
-
-$('detailClose').onclick=()=>{
-  close('detailModal');
-};
+$('formClose').onclick=()=>close('formModal');
+$('detailClose').onclick=()=>close('detailModal');
 
 render();
-
 </script>
-
 </body>
 </html>
