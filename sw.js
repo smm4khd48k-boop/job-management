@@ -1,43 +1,37 @@
-const CACHE_NAME = "work-glossary-v2";
-const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./manifest.json"
-];
+const CACHE_NAME='work-management-v2';
+const APP_SHELL=['./','./index.html','./manifest.json'];
 
-self.addEventListener("install", (event) => {
+self.addEventListener('install',event=>{
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      await cache.addAll(APP_SHELL);
-      const clients = await self.clients.matchAll({ type: "window" });
-      clients.forEach((client) => client.postMessage({ type: "SW_UPDATED" }));
-    })
+    caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_SHELL))
   );
   self.skipWaiting();
 });
 
-self.addEventListener("activate", (event) => {
+self.addEventListener('activate',event=>{
   event.waitUntil(
-    caches.keys().then((keys) =>
+    caches.keys().then(keys=>
       Promise.all(
         keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
+          .filter(key=>key!==CACHE_NAME)
+          .map(key=>caches.delete(key))
       )
-    ).then(() => self.clients.claim())
+    ).then(()=>self.clients.claim())
   );
 });
 
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+self.addEventListener('fetch',event=>{
+  if(event.request.method!=='GET')return;
 
   event.respondWith(
     fetch(event.request)
-      .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+      .then(response=>{
+        const copy=response.clone();
+        caches.open(CACHE_NAME).then(cache=>{
+          cache.put(event.request,copy);
+        });
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(()=>caches.match(event.request))
   );
 });
