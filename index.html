@@ -21,16 +21,16 @@ h1{font-size:24px;margin:0}.count{font-size:11px;color:var(--sub);margin-top:3px
 .list{display:grid;gap:8px}.row{background:#fff;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;padding:13px 8px;cursor:pointer}
 .row-name{font-weight:700;font-size:15px}
 .facility-row,.staff-row{display:grid;align-items:center;gap:10px}
-.facility-row{grid-template-columns:minmax(150px,1.5fr) minmax(110px,0.8fr) minmax(55px,0.5fr)}
+.facility-row{grid-template-columns:minmax(180px,1.45fr) minmax(120px,0.8fr) minmax(90px,0.75fr)}
 .staff-row{grid-template-columns:1fr auto}
 .row-center{font-size:11px;color:var(--sub);line-height:1.6}
 .row-staff{font-size:11px;color:var(--sub);text-align:right;line-height:1.5}
 .row-destination{font-size:11px;color:var(--sub);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-sub,.row-meta{font-size:11px;color:var(--sub);margin-top:4px}
 .row.facility-empty{}.row.facility-empty .row-name{color:#222}
-.row.facility-active{}.row.facility-active .row-name{color:#0b4f8a}
-.row.staff-male{;background:#f1f7fc}.row.staff-male .row-name{color:#0b4f8a}
-.row.staff-female{;background:#fff3f4}.row.staff-female .row-name{color:#8f1d24}
+.row.facility-active{}.row.facility-active .row-name{color:#3B86F7}
+.row.staff-male{;background:#f1f7fc}.row.staff-male .row-name{color:#3B86F7}
+.row.staff-female{;background:#fff3f4}.row.staff-female .row-name{color:#FF0000}
 .kana{font-size:11px;font-weight:700;color:var(--sub);padding:10px 4px 3px}
 .empty{background:#fff;border-radius:14px;padding:32px;text-align:center;color:var(--sub);font-size:13px}
 .modal{position:fixed;inset:0;background:#0006;display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:20}.modal.show{display:flex}
@@ -55,7 +55,7 @@ textarea{min-height:100px;resize:vertical}.multi{display:grid;gap:7px;grid-templ
 .chip{border:1px solid var(--line);border-radius:999px;padding:6px 9px;background:#fff;font-size:11px}
 .note{font-size:11px;color:var(--sub);line-height:1.5;margin-top:6px}
 @media(max-width:560px){
-.facility-row{grid-template-columns:minmax(130px,1.5fr) minmax(95px,0.8fr) minmax(45px,0.5fr)}
+.facility-row{grid-template-columns:minmax(95px,1fr) minmax(95px,1fr) minmax(120px,1.2fr)}
 .facility-row .row-name{font-size:14px}
 .row-staff,.row-destination{font-size:10px}
 }
@@ -175,8 +175,7 @@ function staffPicker(facilityId){
 
 function drawFacilityPicker(currentId){
  const q=hira(($('facilitySearch')?.value||'').trim());
- if(!q){ $('facilityPickList').innerHTML='<div class="note">施設名・ふりがな・施設種別などを入力して検索してください</div>'; return; }
- const list=facilities.filter(f=>hira([f.name,f.kana,f.type,f.address].join(' ')).includes(q)).sort(compareKana);
+ const list=facilities.filter(f=>!q||hira([f.name,f.kana,f.type,f.address].join(' ')).includes(q)).sort(compareKana);
  $('facilityPickList').innerHTML=list.map(f=>`<button type="button" class="pickitem ${currentId===f.id?'selected':''}" data-fid="${esc(f.id)}">${esc(f.name)}<br><small>${esc(f.kana||'ふりがな未入力')}　${esc(f.type||'')}</small></button>`).join('')||'<div class="note">該当する施設がありません</div>';
  document.querySelectorAll('[data-fid]').forEach(b=>b.onclick=()=>{
   const old=$('facilityId').value; const next=b.dataset.fid;
