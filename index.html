@@ -21,9 +21,9 @@ h1{font-size:24px;margin:0}.count{font-size:11px;color:var(--sub);margin-top:3px
 .list{display:grid;gap:8px}.row{background:#fff;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;padding:13px 8px;cursor:pointer}
 .row-name{font-weight:700;font-size:15px}
 .facility-row,.staff-row{display:grid;align-items:center;gap:10px}
-.facility-row{grid-template-columns:minmax(180px,1.45fr) minmax(120px,0.8fr) minmax(90px,0.75fr)}
+.facility-row{grid-template-columns:minmax(0,1fr) 220px 50px}
 .staff-row{grid-template-columns:1fr auto}
-.row-center{font-size:11px;color:var(--sub);line-height:1.6;justify-self:end;text-align:left}
+.row-center{font-size:11px;color:var(--sub);line-height:1.6;justify-self:stretch;text-align:left}
 .row-staff{font-size:11px;color:var(--sub);text-align:right;line-height:1.5}
 .row-destination{font-size:11px;color:var(--sub);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-sub,.row-meta{font-size:11px;color:var(--sub);margin-top:4px}
@@ -55,7 +55,7 @@ textarea{min-height:100px;resize:vertical}.multi{display:grid;gap:7px;grid-templ
 .chip{border:1px solid var(--line);border-radius:999px;padding:6px 9px;background:#fff;font-size:11px}
 .note{font-size:11px;color:var(--sub);line-height:1.5;margin-top:6px}
 @media(max-width:560px){
-.facility-row{grid-template-columns:minmax(95px,1fr) minmax(95px,1fr) minmax(120px,1.2fr)}
+.facility-row{grid-template-columns:minmax(0,1fr) 110px 35px}
 .facility-row .row-name{font-size:14px}
 .row-staff,.row-destination{font-size:10px}
 }
